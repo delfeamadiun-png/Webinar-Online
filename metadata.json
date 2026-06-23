@@ -1,0 +1,6 @@
+{
+  "name": "Webinar UMKM Online",
+  "description": "Platform webinar interaktif berbasis web untuk UMKM Indonesia, dengan manajemen multi-peran dan dasbor kustom.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

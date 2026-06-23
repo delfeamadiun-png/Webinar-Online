@@ -1,0 +1,98 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Registered user accounts (UMKM participants and admins)",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "namaLengkap": { "type": "string" },
+        "email": { "type": "string" },
+        "password": { "type": "string" },
+        "whatsapp": { "type": "string" },
+        "namaUsaha": { "type": "string" },
+        "bidangUsaha": { "type": "string" },
+        "role": { "type": "string", "enum": ["peserta", "admin", "superadmin"] },
+        "registeredWebinars": { "type": "array" },
+        "paidWebinars": { "type": "array" },
+        "checkedIn": { "type": "array" },
+        "certificates": { "type": "array" }
+      },
+      "required": ["id", "namaLengkap", "email", "whatsapp", "role"]
+    },
+    "Webinar": {
+      "title": "Webinar",
+      "description": "Webinar objects with schedule and links",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "speaker": { "type": "string" },
+        "speakerTitle": { "type": "string" },
+        "date": { "type": "string" },
+        "time": { "type": "string" },
+        "status": { "type": "string", "enum": ["upcoming", "live", "completed"] },
+        "description": { "type": "string" },
+        "summary": { "type": "string" },
+        "materialUrl": { "type": "string" },
+        "recordingUrl": { "type": "string" },
+        "zoomJoinUrl": { "type": "string" },
+        "zoomStartUrl": { "type": "string" },
+        "registeredCount": { "type": "integer" }
+      },
+      "required": ["id", "title", "speaker", "speakerTitle", "date", "time", "status", "description"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Messages sent in real-time webinar chats",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "webinarId": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderRole": { "type": "string", "enum": ["peserta", "admin", "superadmin"] },
+        "message": { "type": "string" },
+        "timestamp": { "type": "string" }
+      },
+      "required": ["id", "webinarId", "senderName", "senderRole", "message", "timestamp"]
+    },
+    "SystemSettings": {
+      "title": "SystemSettings",
+      "description": "Global administration settings",
+      "type": "object",
+      "properties": {
+        "zoomApiKey": { "type": "string" },
+        "zoomConnected": { "type": "boolean" },
+        "googleCalendarConnected": { "type": "boolean" },
+        "midtransConnected": { "type": "boolean" },
+        "midtransClientKey": { "type": "string" },
+        "restrictZoomUnpaid": { "type": "boolean" },
+        "bankInfoBank": { "type": "string" },
+        "bankInfoNumber": { "type": "string" },
+        "bankInfoName": { "type": "string" },
+        "ticketPrice": { "type": "integer" },
+        "totalSales": { "type": "integer" },
+        "trafficVisits": { "type": "integer" }
+      },
+      "required": ["zoomApiKey", "zoomConnected", "googleCalendarConnected", "midtransConnected", "midtransClientKey", "restrictZoomUnpaid", "bankInfoBank", "bankInfoNumber", "bankInfoName", "ticketPrice", "totalSales", "trafficVisits"]
+    }
+  },
+  "firestore": {
+    "users": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "Registry of users indexed by their email in lowercase"
+    },
+    "webinars": {
+      "schema": { "$ref": "#/entities/Webinar" },
+      "description": "Active webinar lists"
+    },
+    "chats": {
+      "schema": { "$ref": "#/entities/ChatMessage" },
+      "description": "Real-time live chats for webinars"
+    },
+    "settings": {
+      "schema": { "$ref": "#/entities/SystemSettings" },
+      "description": "Global config documents"
+    }
+  }
+}
