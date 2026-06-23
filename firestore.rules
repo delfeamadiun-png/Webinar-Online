@@ -7,71 +7,24 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
-    function isValidId(id) { 
-      return id is string && id.size() <= 128; 
-    }
-
-    function isValidUser(data) {
-      return data.namaLengkap is string && data.namaLengkap.size() <= 200
-          && data.email is string && data.email.size() <= 100
-          && data.whatsapp is string && data.whatsapp.size() <= 30
-          && data.role is string && (data.role == 'peserta' || data.role == 'admin' || data.role == 'superadmin');
-    }
-
-    function isValidWebinar(data) {
-      return data.title is string && data.title.size() <= 300
-          && data.speaker is string && data.speaker.size() <= 200
-          && data.status is string && (data.status == 'upcoming' || data.status == 'live' || data.status == 'completed');
-    }
-
-    function isValidChatMessage(data) {
-      return data.webinarId is string && data.webinarId.size() <= 128
-          && data.senderName is string && data.senderName.size() <= 200
-          && data.message is string && data.message.size() <= 2000
-          && data.timestamp is string;
-    }
-
-    function isValidSettings(data) {
-      return data.zoomApiKey is string
-          && data.zoomConnected is bool
-          && data.googleCalendarConnected is bool
-          && data.midtransConnected is bool
-          && data.midtransClientKey is string
-          && data.restrictZoomUnpaid is bool
-          && data.bankInfoBank is string
-          && data.bankInfoNumber is string
-          && data.bankInfoName is string
-          && data.ticketPrice is number
-          && data.totalSales is number
-          && data.trafficVisits is number;
-    }
-
-    // Settings collection
+    // Settings collection - read/write for anyone
     match /settings/{settingsId} {
-      allow read: if true;
-      allow create, update: if isValidSettings(request.resource.data);
-      allow delete: if false;
+      allow read, write: if true;
     }
 
-    // Users collection
+    // Users collection - read/write for anyone
     match /users/{userId} {
-      allow read: if true;
-      allow create, update: if isValidUser(request.resource.data);
-      allow delete: if false;
+      allow read, write: if true;
     }
 
-    // Webinars collection
+    // Webinars collection - read/write for anyone
     match /webinars/{webinarId} {
-      allow read: if true;
-      allow create, update: if isValidWebinar(request.resource.data);
-      allow delete: if true; 
+      allow read, write: if true;
     }
 
-    // Chats collection
+    // Chats collection - read/write for anyone
     match /chats/{chatId} {
-      allow read: if true;
-      allow create, update: if isValidChatMessage(request.resource.data);
-      allow delete: if true; 
+      allow read, write: if true;
     }
   }
 }

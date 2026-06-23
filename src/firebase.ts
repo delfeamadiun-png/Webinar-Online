@@ -14,7 +14,17 @@ import {
   orderBy,
   writeBatch
 } from "firebase/firestore";
-import { User, Webinar, ChatMessage, SystemSettings, DB } from "./database";
+import { 
+  User, 
+  Webinar, 
+  ChatMessage, 
+  SystemSettings, 
+  DB,
+  INITIAL_USERS,
+  INITIAL_WEBINARS,
+  INITIAL_SETTINGS,
+  INITIAL_CHAT_MESSAGES 
+} from "./database";
 
 const firebaseConfig = {
   projectId: "handy-modem-36d0h",
@@ -78,13 +88,66 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   throw new Error(JSON.stringify(errInfo));
 }
 
+// Clean Direct Fetch from Firebase Firestore during init/page refresh
+export async function fetchCollectionsFromFirestore(): Promise<void> {
+  try {
+    console.log("Performing clean initial fetch directly from Cloud Firestore...");
+
+    // 1. Fetch settings
+    const settingsSnap = await getDoc(doc(db, "settings", "global"));
+    if (settingsSnap.exists()) {
+      localStorage.setItem("umkm_webinar_settings", JSON.stringify(settingsSnap.data()));
+    } else {
+      const defaultEmptySettings: SystemSettings = {
+        zoomApiKey: '',
+        zoomConnected: false,
+        googleCalendarConnected: false,
+        midtransConnected: false,
+        midtransClientKey: '',
+        restrictZoomUnpaid: false,
+        bankInfoBank: '',
+        bankInfoNumber: '',
+        bankInfoName: '',
+        ticketPrice: 0,
+        totalSales: 0,
+        trafficVisits: 0
+      };
+      localStorage.setItem("umkm_webinar_settings", JSON.stringify(defaultEmptySettings));
+    }
+
+    // 2. Fetch users
+    const usersSnap = await getDocs(collection(db, "users"));
+    const users: User[] = [];
+    usersSnap.forEach((docSnap) => {
+      users.push(docSnap.data() as User);
+    });
+    localStorage.setItem("umkm_webinar_users", JSON.stringify(users)); // Empty array [] if empty
+
+    // 3. Fetch webinars
+    const webinarsSnap = await getDocs(collection(db, "webinars"));
+    const webinars: Webinar[] = [];
+    webinarsSnap.forEach((docSnap) => {
+      webinars.push(docSnap.data() as Webinar);
+    });
+    webinars.sort((a, b) => a.id.localeCompare(b.id));
+    localStorage.setItem("umkm_webinar_webinars", JSON.stringify(webinars)); // Empty array [] if empty
+
+    // 4. Fetch chats
+    const chatsSnap = await getDocs(collection(db, "chats"));
+    const chats: ChatMessage[] = [];
+    chatsSnap.forEach((docSnap) => {
+      chats.push(docSnap.data() as ChatMessage);
+    });
+    localStorage.setItem("umkm_webinar_chats", JSON.stringify(chats)); // Empty array [] if empty
+
+    console.log("Direct Cloud Firestore fetch complete. State loaded cleanly.");
+  } catch (err) {
+    console.error("Failed to fetch collections from Cloud Firestore:", err);
+  }
+}
+
 // Seed Initial Data to Firestore if empty
-export async function seedFirestoreIfNeeded(
-  initialUsers: User[],
-  initialWebinars: Webinar[],
-  initialSettings: SystemSettings,
-  initialChats: ChatMessage[]
-) {
+export async function seedFirestoreIfNeeded() {
   if (isSeeded) return;
   try {
     console.log("Checking Firestore collections to ensure they are fully populated and self-healed...");
@@ -95,7 +158,7 @@ export async function seedFirestoreIfNeeded(
       const settingsSnap = await getDoc(settingsDocRef);
       if (!settingsSnap.exists()) {
         console.log("Settings global missing. Seeding system settings...");
-        await setDoc(settingsDocRef, initialSettings);
+        await setDoc(settingsDocRef, INITIAL_SETTINGS);
       }
     } catch (e) {
       console.warn("Could not retrieve/seed settings, checking users...", e);
@@ -107,7 +170,7 @@ export async function seedFirestoreIfNeeded(
       const superadminSnap = await getDoc(superadminDocRef);
       if (!superadminSnap.exists()) {
         console.log("Superadmin account missing from Firestore. Seeding administrative and initial users...");
-        for (const u of initialUsers) {
+        for (const u of INITIAL_USERS) {
           await setDoc(doc(db, "users", u.email.toLowerCase()), u);
         }
       }
@@ -120,7 +183,7 @@ export async function seedFirestoreIfNeeded(
       const webinarsSnap = await getDocs(collection(db, "webinars"));
       if (webinarsSnap.empty) {
         console.log("Webinars collection empty. Seeding initial webinars...");
-        for (const w of initialWebinars) {
+        for (const w of INITIAL_WEBINARS) {
           await setDoc(doc(db, "webinars", w.id), w);
         }
       }

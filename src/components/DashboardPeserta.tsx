@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { User, Webinar, DB } from '../database';
 import { Calendar, Award, FileText, Video, CheckCircle, Search, QrCode, PlayCircle, Info, Bookmark, ExternalLink, Lock, CreditCard, Check, BookOpen, Download, Volume2, Tv } from 'lucide-react';
 import ChatBox from './ChatBox';
@@ -29,6 +29,17 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCert, setActiveCert] = useState<{ webinarTitle: string; code: string; date: string } | null>(null);
   const [qrWebinarId, setQrWebinarId] = useState<string | null>(null);
+
+  // Auto-play the live webinar if the user is registered but hasn't selected anything yet
+  const registeredIdsString = currentUser.registeredWebinars.join(',');
+  useEffect(() => {
+    if (!activePlayWebinarId) {
+      const liveEnrolled = webinars.find(w => w.status === 'live' && currentUser.registeredWebinars.includes(w.id));
+      if (liveEnrolled) {
+        setActivePlayWebinarId(liveEnrolled.id);
+      }
+    }
+  }, [registeredIdsString, activePlayWebinarId]);
 
   // Filter webinars based on search
   const filteredWebinars = webinars.filter(w => 

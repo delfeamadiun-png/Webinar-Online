@@ -4,8 +4,8 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { User, Webinar, DB, INITIAL_USERS, INITIAL_WEBINARS, INITIAL_SETTINGS, INITIAL_CHAT_MESSAGES } from './database';
-import { seedFirestoreIfNeeded, startRealtimeSync } from './firebase';
+import { User, Webinar, DB } from './database';
+import { seedFirestoreIfNeeded, startRealtimeSync, fetchCollectionsFromFirestore } from './firebase';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import AuthModal from './components/AuthModal';
@@ -19,6 +19,7 @@ export default function App() {
   const [activeView, setActiveView] = useState<'landing' | 'peserta_dashboard' | 'admin_dashboard' | 'superadmin_dashboard'>('landing');
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [authInitialMode, setAuthInitialMode] = useState<'login' | 'register'>('login');
+  const [isLoading, setIsLoading] = useState(true);
   
   // Filtering states on Landing Page
   const [selectedBidangUsaha, setSelectedBidangUsaha] = useState<string>('Semua');
@@ -28,27 +29,47 @@ export default function App() {
   const [refreshSeed, setRefreshSeed] = useState(0);
 
   useEffect(() => {
-    // Seed Firestore with default data if empty
-    seedFirestoreIfNeeded(INITIAL_USERS, INITIAL_WEBINARS, INITIAL_SETTINGS, INITIAL_CHAT_MESSAGES);
+    let syncUnsubscribe: (() => void) | null = null;
+    let isMounted = true;
 
-    // Subscribe to Firestore updates
-    const syncUnsubscribe = startRealtimeSync(() => {
-      // Force component re-render when Firestore triggers onSnapshot
-      setRefreshSeed(prev => prev + 1);
-      
-      const lastUser = localStorage.getItem('umkm_last_active_user');
-      if (lastUser) {
-        try {
-          const u = JSON.parse(lastUser) as User;
-          const fresh = DB.getUserByEmail(u.email);
-          if (fresh) {
-            setCurrentUser(fresh);
-          }
-        } catch (e) {
-          console.error('Error auto-refreshing user session:', e);
+    async function initializeAppData() {
+      try {
+        // Seed Firestore internally with default data if indeed brand new and empty
+        await seedFirestoreIfNeeded();
+
+        // Fetch direct current state from Cloud Firestore
+        await fetchCollectionsFromFirestore();
+
+        if (isMounted) {
+          // Subscribe to Firestore updates and real-time syncing ONLY after clean init
+          syncUnsubscribe = startRealtimeSync(() => {
+            // Force component re-render when Firestore triggers onSnapshot
+            setRefreshSeed(prev => prev + 1);
+            
+            const lastUser = localStorage.getItem('umkm_last_active_user');
+            if (lastUser) {
+              try {
+                const u = JSON.parse(lastUser) as User;
+                const fresh = DB.getUserByEmail(u.email);
+                if (fresh) {
+                  setCurrentUser(fresh);
+                }
+              } catch (e) {
+                console.error('Error auto-refreshing user session:', e);
+              }
+            }
+          });
+        }
+      } catch (err) {
+        console.error("Initialization error:", err);
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
         }
       }
-    });
+    }
+
+    initializeAppData();
 
     // Increase traffic count on page mount
     DB.increaseTraffic();
@@ -78,7 +99,11 @@ export default function App() {
     });
 
     return () => {
+      isMounted = false;
       unsubDB();
+      if (syncUnsubscribe) {
+        syncUnsubscribe();
+      }
     };
   }, []);
 
@@ -163,6 +188,27 @@ export default function App() {
     // Redirect to dashboard to see conference room
     setActiveView('peserta_dashboard');
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen gradient-bg text-slate-100 flex flex-col items-center justify-center font-sans p-6 text-center">
+        <div className="glass border border-white/10 rounded-3xl p-8 max-w-sm w-full space-y-6 shadow-2xl accent-glow-indigo">
+          <div className="relative w-16 h-16 mx-auto">
+            <div className="absolute inset-0 rounded-full border-2 border-indigo-500/20"></div>
+            <div className="absolute inset-0 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
+          </div>
+          <div className="space-y-2">
+            <h2 className="text-xl font-extrabold text-white tracking-wide">
+              Webinar UMKM Online
+            </h2>
+            <p className="text-xs text-indigo-300 font-mono tracking-widest uppercase animate-pulse">
+              Memuat Data dari Cloud...
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen gradient-bg text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">

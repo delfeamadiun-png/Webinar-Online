@@ -1,5 +1,6 @@
 import React from 'react';
 import { Calendar, Users, Award, PlayCircle, ShieldCheck, Globe } from 'lucide-react';
+import { DB, Webinar } from '../database';
 
 interface HeroProps {
   onExploreClick: () => void;
@@ -8,6 +9,19 @@ interface HeroProps {
 }
 
 export default function Hero({ onExploreClick, onRegisterClick, isLoggedIn }: HeroProps) {
+  const webinars = DB.getWebinars();
+  const liveWebinar = webinars.find(w => w.status === 'live');
+  const upcomingWebinar = webinars.find(w => w.status === 'upcoming');
+  const displayedWebinar = liveWebinar || upcomingWebinar || webinars[0];
+
+  const getCategoryTag = (webinar: Webinar) => {
+    const text = (webinar.title + " " + webinar.description).toLowerCase();
+    if (text.includes("kuliner") || text.includes("makanan") || text.includes("resep")) return "KULINER";
+    if (text.includes("retail") || text.includes("pembukuan") || text.includes("keuangan")) return "RETAIL & FINANCE";
+    if (text.includes("ekspor") || text.includes("global") || text.includes("pasar luar")) return "EKSPOR";
+    if (text.includes("digital") || text.includes("marketing") || text.includes("tiktok") || text.includes("iklan")) return "DIGITAL MARKETING";
+    return "UMKM AKSELERASI";
+  };
   return (
     <div className="relative overflow-hidden py-16 md:py-24 border-b border-white/10">
       {/* Decorative background grid and flares */}
@@ -84,50 +98,72 @@ export default function Hero({ onExploreClick, onRegisterClick, isLoggedIn }: He
               <div className="relative glass border border-white/10 rounded-3xl p-6 shadow-2xl accent-glow-indigo">
                 <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
-                    <span className="text-xs font-mono font-semibold text-rose-400 tracking-wider uppercase">🔴 Live Sekarang</span>
+                    {displayedWebinar?.status === 'live' ? (
+                      <>
+                        <span className="w-2.5 h-2.5 bg-rose-500 rounded-full animate-ping"></span>
+                        <span className="text-xs font-mono font-semibold text-rose-400 tracking-wider uppercase">🔴 Live Sekarang</span>
+                      </>
+                    ) : displayedWebinar?.status === 'completed' ? (
+                      <>
+                        <span className="text-xs font-mono font-semibold text-slate-400 tracking-wider uppercase font-mono">🎬 Rekaman Selesai</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+                        <span className="text-xs font-mono font-semibold text-indigo-400 tracking-wider uppercase font-mono">🗓️ Kelas Mendatang</span>
+                      </>
+                    )}
                   </div>
-                  <span className="text-xs font-mono text-indigo-300 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-500/10">IDR 0 (Free Cover)</span>
+                  <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-500/10">IDR 0 (Free)</span>
                 </div>
 
-                <div className="space-y-4">
-                  <span className="inline-block px-2.5 py-1 bg-indigo-500/10 text-indigo-300 text-[11px] font-bold rounded border border-indigo-500/10">
-                    Retail & Pembukuan
-                  </span>
-                  
-                  <h3 className="text-lg font-bold text-slate-100 font-sans leading-snug">
-                    Optimalisasi Finansial & Pembukuan Praktis Berbasis Aplikasi bagi Bisnis Retail
-                  </h3>
+                {displayedWebinar ? (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-2.5">
+                      <span className="inline-block px-2.5 py-1 bg-indigo-500/10 text-indigo-300 text-[10px] font-bold rounded border border-indigo-500/10 uppercase tracking-wide">
+                        {getCategoryTag(displayedWebinar)}
+                      </span>
+                      <span className="text-[10px] text-slate-400 font-mono italic">{displayedWebinar.date}</span>
+                    </div>
+                    
+                    <h3 className="text-base font-bold text-slate-100 font-sans leading-snug">
+                      {displayedWebinar.title}
+                    </h3>
 
-                  <div className="p-3 bg-slate-950/40 rounded-xl border border-white/5 space-y-2">
-                    <div className="flex items-center text-xs space-x-2">
-                      <Users className="w-4 h-4 text-indigo-400" />
-                      <span className="font-semibold text-indigo-300 font-mono">218 UMKM Terdaftar</span>
+                    <div className="p-3 bg-slate-950/40 rounded-xl border border-white/5 space-y-2">
+                      <div className="flex items-center text-xs space-x-2">
+                        <Users className="w-4 h-4 text-indigo-400" />
+                        <span className="font-semibold text-indigo-300 font-mono">{displayedWebinar.registeredCount} UMKM Terdaftar</span>
+                      </div>
+                      <div className="flex items-center text-xs space-x-2 text-slate-300">
+                        <Award className="w-4 h-4 text-violet-400" />
+                        <span className="truncate">E-Sertifikat Kelulusan Resmi</span>
+                      </div>
                     </div>
-                    <div className="flex items-center text-xs space-x-2 text-slate-300">
-                      <Award className="w-4 h-4 text-violet-400" />
-                      <span>E-Sertifikat Pembukuan Digital</span>
+
+                    <div className="flex items-center space-x-3 pt-2">
+                      <div className="w-9 h-9 bg-indigo-500/10 rounded-full flex items-center justify-center font-bold text-indigo-300 text-xs border border-indigo-500/25">
+                        {displayedWebinar.speaker.charAt(0)}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs font-bold text-slate-200 truncate">{displayedWebinar.speaker}</h4>
+                        <p className="text-[10px] text-slate-400 truncate">{displayedWebinar.speakerTitle}</p>
+                      </div>
                     </div>
+
+                    <button
+                      onClick={onExploreClick}
+                      id="btn-hero-cta-quick"
+                      className="w-full mt-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition-all shadow-md shadow-indigo-600/15 cursor-pointer accent-glow"
+                    >
+                      {displayedWebinar.status === 'live' ? 'Masuk Sesi Live Zoom' : 'Daftar & Ikuti Kelas'}
+                    </button>
                   </div>
-
-                  <div className="flex items-center space-x-3 pt-2">
-                    <div className="w-9 h-9 bg-indigo-500/10 rounded-full flex items-center justify-center font-bold text-indigo-300 text-sm border border-indigo-500/25">
-                      RW
-                    </div>
-                    <div>
-                      <h4 className="text-xs font-bold text-slate-200">Rina Wijaya, CPA</h4>
-                      <p className="text-[10px] text-slate-400">Konsultan Keuangan UMKM Indonesia</p>
-                    </div>
+                ) : (
+                  <div className="text-center py-6 text-slate-500 text-xs">
+                    Belum ada kelas webinar terdaftar.
                   </div>
-
-                  <button
-                    onClick={onExploreClick}
-                    id="btn-hero-cta-quick"
-                    className="w-full mt-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl tracking-wider uppercase transition-all shadow-md shadow-indigo-600/15 cursor-pointer accent-glow"
-                  >
-                    Masuk Kelas & Unduh PDF
-                  </button>
-                </div>
+                )}
               </div>
             </div>
           </div>

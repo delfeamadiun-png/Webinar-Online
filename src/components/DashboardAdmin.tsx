@@ -19,6 +19,16 @@ export default function DashboardAdmin({ currentUser }: DashboardAdminProps) {
   const [newSlideUrl, setNewSlideUrl] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Subscription for real-time synchronization with DB
+  React.useEffect(() => {
+    const unsubscribe = DB.subscribe(() => {
+      const freshWebinars = DB.getWebinars();
+      setWebinars(freshWebinars);
+      setUsers(DB.getUsers());
+    });
+    return unsubscribe;
+  }, []);
+
   const activeWebinar = webinars.find(w => w.id === selectedWebinarId) || webinars[0];
 
   // Refresh users list
@@ -41,7 +51,16 @@ export default function DashboardAdmin({ currentUser }: DashboardAdminProps) {
       setIsZoomStarting(false);
       setZoomStarted(prev => ({ ...prev, [webinarId]: true }));
       
-      // Update status to 'live' in database
+      // Auto-complete any other live webinars to avoid concurrent active states
+      const allWebinars = DB.getWebinars();
+      allWebinars.forEach(w => {
+        if (w.id !== webinarId && w.status === 'live') {
+          const updated = { ...w, status: 'completed' as const };
+          DB.updateWebinar(updated);
+        }
+      });
+
+      // Update status of this webinar to 'live' in database
       const item = DB.getWebinarById(webinarId);
       if (item) {
         item.status = 'live';

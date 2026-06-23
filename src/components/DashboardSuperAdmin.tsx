@@ -145,6 +145,18 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
       return;
     }
 
+    // Coerce other live webinars to completed if setting status to live
+    if (status === 'live') {
+      const allWebinars = DB.getWebinars();
+      allWebinars.forEach(w => {
+        // Exclude the current editing item to avoid nested save conflicts
+        if (w.id !== isEditingWebinar && w.status === 'live') {
+          const updated = { ...w, status: 'completed' as const };
+          DB.updateWebinar(updated);
+        }
+      });
+    }
+
     if (isEditingWebinar === 'new') {
       const newWeb: Webinar = {
         id: `webinar-${Date.now()}`,
