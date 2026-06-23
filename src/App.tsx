@@ -164,6 +164,27 @@ export default function App() {
     return true;
   });
 
+  const settings = DB.getSettings();
+  const features = settings.featuresList && settings.featuresList.length > 0
+    ? settings.featuresList
+    : [
+        {
+          id: 'feat-1',
+          title: '100% Gratis Bersertifikat',
+          description: 'Seluruh sesi webinar didukung penuh oleh asosiasi UMKM bersama kementerian untuk mengakselerasi keterampilan manajemen.'
+        },
+        {
+          id: 'feat-2',
+          title: 'Integrasi Zoom Interaktif',
+          description: 'Berdiskusi dua arah dengan pemateri, bertanya via board chat, dan menyerap materi praktek harian secara langsung.'
+        },
+        {
+          id: 'feat-3',
+          title: 'Alumni Terbukti Sukses Ekspor',
+          description: 'Raih peluang jejaring dan saksikan ratusan komoditas retail kriya, kuliner, dan fashion binaan yang berhasil go global.'
+        }
+      ];
+
   const handleRegisterToWebinarFromLanding = (wId: string) => {
     if (!currentUser) {
       handleOpenAuth('register');
@@ -244,7 +265,7 @@ export default function App() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8" id="webinar-section">
               <div className="text-center">
                 <span className="text-indigo-400 text-xs font-mono font-bold uppercase tracking-widest block mb-1">
-                  AGENDA TERJADWAL
+                  {settings.landingAgendaTitle || 'AGENDA TERJADWAL'}
                 </span>
                 <h2 className="text-3xl font-sans font-extrabold text-white">
                   Jadwal Kelas Webinar UMKM Terlaris
@@ -259,7 +280,9 @@ export default function App() {
                 
                 {/* Category filters */}
                 <div className="flex items-center space-x-2 overflow-x-auto w-full sm:w-auto pb-2 sm:pb-0 scrollbar-none">
-                  <span className="text-[11px] font-semibold uppercase font-mono text-slate-400 shrink-0">Filter Topik:</span>
+                  <span className="text-[11px] font-semibold uppercase font-mono text-slate-400 shrink-0">
+                    {settings.landingFilterLabel || 'Filter Topik:'}
+                  </span>
                   {['Semua', 'Kuliner', 'Retail', 'Ekspor', 'Digital Marketing'].map((cat) => (
                     <button
                       key={cat}
@@ -378,21 +401,21 @@ export default function App() {
             {/* Testimonials / Program benefits */}
             <div className="glass border-t border-b border-white/5 py-16 backdrop-blur-md shadow-inner">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="space-y-2">
-                  <div className="w-10 h-10 bg-indigo-500/15 text-indigo-300 border border-indigo-500/10 rounded-xl flex items-center justify-center font-bold">✓</div>
-                  <h4 className="text-sm font-bold text-slate-200">100% Gratis Bersertifikat</h4>
-                  <p className="text-xs text-slate-400 leading-relaxed font-sans">Seluruh sesi webinar didukung penuh oleh asosiasi UMKM bersama kementerian untuk mengakselerasi keterampilan manajemen.</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="w-10 h-10 bg-violet-500/15 text-violet-300 border border-violet-500/10 rounded-xl flex items-center justify-center font-bold">✓</div>
-                  <h4 className="text-sm font-bold text-slate-200">Integrasi Zoom Interaktif</h4>
-                  <p className="text-xs text-slate-400 leading-relaxed font-sans">Berdiskusi dua arah dengan pemateri, bertanya via board chat, dan menyerap materi praktek harian secara langsung.</p>
-                </div>
-                <div className="space-y-2">
-                  <div className="w-10 h-10 bg-fuchsia-500/15 text-fuchsia-300 border border-fuchsia-500/10 rounded-xl flex items-center justify-center font-bold">✓</div>
-                  <h4 className="text-sm font-bold text-slate-200">Alumni Terbukti Sukses Ekspor</h4>
-                  <p className="text-xs text-slate-400 leading-relaxed font-sans">Raih peluang jejaring dan saksikan ratusan komoditas retail kriya, kuliner, dan fashion binaan yang berhasil go global.</p>
-                </div>
+                {features.map((feat, index) => {
+                  const colors = [
+                    'bg-indigo-500/15 text-indigo-300 border-indigo-500/15',
+                    'bg-violet-500/15 text-violet-300 border-violet-500/15',
+                    'bg-fuchsia-500/15 text-fuchsia-300 border-fuchsia-500/15'
+                  ];
+                  const colorClass = colors[index % colors.length];
+                  return (
+                    <div key={feat.id || index} className="space-y-2">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold border ${colorClass}`}>✓</div>
+                      <h4 className="text-sm font-bold text-slate-200">{feat.title}</h4>
+                      <p className="text-xs text-slate-400 leading-relaxed font-sans">{feat.description}</p>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -440,58 +463,6 @@ export default function App() {
           </div>
         </div>
       </footer>
-
-      {/* Floater instant Role Simulator tool at bottom right */}
-      <div className="fixed bottom-4 right-4 z-40 glass border border-white/10 rounded-2xl p-3.5 shadow-2xl flex flex-col items-center space-y-2 max-w-[210px] accent-glow-indigo" id="simulasi-peran-sidebar">
-        <div className="flex items-center space-x-1.5 border-b border-white/10 pb-1.5 w-full justify-between">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-          <span className="text-[9px] font-bold font-mono text-slate-350 tracking-wider">SIMULATOR PERAN</span>
-          <span className="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
-        </div>
-        
-        <p className="text-[9px] text-slate-455 text-center leading-normal">
-          Beralih hak akses instan untuk menguji visual dasbor:
-        </p>
-        
-        <div className="grid grid-cols-1 gap-1.5 w-full">
-          <button
-            onClick={() => handleSimulateRole('peserta')}
-            id="sim-peserta-trigger"
-            className="w-full text-left py-1 px-1.5 bg-white/5 hover:bg-indigo-600/35 border border-white/5 rounded text-slate-200 text-[9px] font-medium transition cursor-pointer flex items-center justify-between"
-          >
-            <span>🎒 Peserta</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500"></div>
-          </button>
-          
-          <button
-            onClick={() => handleSimulateRole('admin')}
-            id="sim-admin-trigger"
-            className="w-full text-left py-1 px-1.5 bg-white/5 hover:bg-indigo-600/35 border border-white/5 rounded text-slate-200 text-[9px] font-medium transition cursor-pointer flex items-center justify-between"
-          >
-            <span>🛡️ Moderator</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400"></div>
-          </button>
-          
-          <button
-            onClick={() => handleSimulateRole('superadmin')}
-            id="sim-super-trigger"
-            className="w-full text-left py-1 px-1.5 bg-white/5 hover:bg-indigo-600/35 border border-white/5 rounded text-slate-200 text-[9px] font-medium transition cursor-pointer flex items-center justify-between"
-          >
-            <span>⚜️ Super Admin</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-violet-405"></div>
-          </button>
-        </div>
-
-        <button
-          onClick={() => {
-            handleLogout();
-            setActiveView('landing');
-          }}
-          className="text-[8px] text-slate-455 hover:text-rose-400 font-bold uppercase transition"
-        >
-          Reset Peran / Keluar
-        </button>
-      </div>
 
       {/* Auth modal Popup coordinator */}
       <AuthModal

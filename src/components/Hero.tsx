@@ -14,6 +14,13 @@ export default function Hero({ onExploreClick, onRegisterClick, isLoggedIn }: He
   const upcomingWebinar = webinars.find(w => w.status === 'upcoming');
   const displayedWebinar = liveWebinar || upcomingWebinar || webinars[0];
 
+  const settings = DB.getSettings();
+  const landingTitle = settings.landingTitle || 'Webinar UMKM';
+  const landingSubTitle = settings.landingSubTitle || 'Online Hub';
+  const landingHeroBadge = settings.landingHeroBadge || 'Akselerasi Pengusaha Mikro Indonesia';
+  const landingHeroTitle = settings.landingHeroTitle || 'Go Digital & Naik Kelas';
+  const landingHeroDesc = settings.landingHeroDesc || 'Dapatkan ilmu bisnis praktis langsung dari para ahli pengekspor, praktisi digital marketing, dan konsultan keuangan nasional. Program dibimbing interaktif dengan materi PDF, e-sertifikat resmi, dan live workshop Zoom terintegrasi.';
+
   const getCategoryTag = (webinar: Webinar) => {
     const text = (webinar.title + " " + webinar.description).toLowerCase();
     if (text.includes("kuliner") || text.includes("makanan") || text.includes("resep")) return "KULINER";
@@ -35,19 +42,23 @@ export default function Hero({ onExploreClick, onRegisterClick, isLoggedIn }: He
           {/* Text Content */}
           <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-7 lg:text-left">
             <div className="inline-flex items-center space-x-2 px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-6">
-              <Globe className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Akselerasi Pengusaha Mikro Indonesia</span>
+              {settings.landingLogoUrl ? (
+                <img src={settings.landingLogoUrl} className="w-4 h-4 rounded-full object-cover mr-1 shrink-0" alt="Logo mini" />
+              ) : (
+                <Globe className="w-3.5 h-3.5 text-indigo-400" />
+              )}
+              <span>{landingHeroBadge}</span>
             </div>
             
             <h1 className="text-4xl tracking-tight font-sans font-extrabold text-white sm:text-5xl md:text-6xl leading-none">
-              Webinar UMKM Online{' '}
-              <span className="block text-gradient bg-gradient-to-r from-indigo-400 to-violet-300 bg-clip-text text-transparent">
-                Go Digital & Naik Kelas
+              {landingTitle}{' '}
+              <span className="block text-gradient bg-gradient-to-r from-indigo-400 to-violet-300 bg-clip-text text-transparent mt-1">
+                {landingHeroTitle}
               </span>
             </h1>
             
             <p className="mt-4 text-base text-slate-350 sm:mt-5 sm:text-lg lg:text-base xl:text-lg leading-relaxed">
-              Dapatkan ilmu bisnis praktis langsung dari para ahli pengekspor, praktisi digital marketing, dan konsultan keuangan nasional. Program dibimbing interaktif dengan materi PDF, e-sertifikat resmi, dan live workshop Zoom terintegrasi.
+              {landingHeroDesc}
             </p>
 
             <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">

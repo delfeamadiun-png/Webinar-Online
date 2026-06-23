@@ -140,5 +140,34 @@ export const INITIAL_SETTINGS: SystemSettings = {
   bankInfoName: 'CV UMKM Digital Indonesia',
   ticketPrice: 50000, 
   totalSales: 8250000, 
-  trafficVisits: 1420
+  trafficVisits: 1420,
+
+  // Custom landing settings defaults
+  landingTitle: 'WEBINAR UMKM',
+  landingSubTitle: 'Online Hub',
+  landingHeroBadge: 'Akselerasi Pengusaha Mikro Indonesia',
+  landingHeroTitle: 'Go Digital & Naik Kelas',
+  landingHeroDesc: 'Dapatkan ilmu bisnis praktis langsung dari para ahli pengekspor, praktisi digital marketing, dan konsultan keuangan nasional. Program dibimbing interaktif dengan materi PDF, e-sertifikat resmi, dan live workshop Zoom terintegrasi.',
+  landingAgendaTitle: 'AGENDA TERJADWAL',
+  landingFilterLabel: 'Filter Topik:',
+  landingLogoUrl: '', // Default represents default Globe icon or a beautiful vector
+
+  // Custom benefits list default items
+  featuresList: [
+    {
+      id: 'feat-1',
+      title: '100% Gratis Bersertifikat',
+      description: 'Seluruh sesi webinar didukung penuh oleh asosiasi UMKM bersama kementerian untuk mengakselerasi keterampilan manajemen.'
+    },
+    {
+      id: 'feat-2',
+      title: 'Integrasi Zoom Interaktif',
+      description: 'Berdiskusi dua arah dengan pemateri, bertanya via board chat, dan menyerap materi praktek harian secara langsung.'
+    },
+    {
+      id: 'feat-3',
+      title: 'Alumni Terbukti Sukses Ekspor',
+      description: 'Raih peluang jejaring dan saksikan ratusan komoditas retail kriya, kuliner, dan fashion binaan yang berhasil go global.'
+    }
+  ]
 };

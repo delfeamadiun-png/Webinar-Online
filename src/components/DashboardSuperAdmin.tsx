@@ -40,6 +40,22 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
   const [bankInfoNumber, setBankInfoNumber] = useState(settings.bankInfoNumber || '8830123456');
   const [bankInfoName, setBankInfoName] = useState(settings.bankInfoName || 'CV UMKM Digital Indonesia');
 
+  // Landing Page Copy & Branding customisation states
+  const [landingTitle, setLandingTitle] = useState(settings.landingTitle || '');
+  const [landingSubTitle, setLandingSubTitle] = useState(settings.landingSubTitle || '');
+  const [landingHeroBadge, setLandingHeroBadge] = useState(settings.landingHeroBadge || '');
+  const [landingHeroTitle, setLandingHeroTitle] = useState(settings.landingHeroTitle || '');
+  const [landingHeroDesc, setLandingHeroDesc] = useState(settings.landingHeroDesc || '');
+  const [landingAgendaTitle, setLandingAgendaTitle] = useState(settings.landingAgendaTitle || '');
+  const [landingFilterLabel, setLandingFilterLabel] = useState(settings.landingFilterLabel || '');
+  const [landingLogoUrl, setLandingLogoUrl] = useState(settings.landingLogoUrl || '');
+  const [featuresList, setFeaturesList] = useState(settings.featuresList || []);
+
+  // Features list item CRUD helpers
+  const [newFeatureTitle, setNewFeatureTitle] = useState('');
+  const [newFeatureDesc, setNewFeatureDesc] = useState('');
+  const [editingFeatureId, setEditingFeatureId] = useState<string | null>(null);
+
   const [successMsg, setSuccessMsg] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'webinars' | 'users' | 'api'>('overview');
 
@@ -54,6 +70,16 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
       setBankInfoBank(latestSettings.bankInfoBank || 'Bank BCA');
       setBankInfoNumber(latestSettings.bankInfoNumber || '8830123456');
       setBankInfoName(latestSettings.bankInfoName || 'CV UMKM Digital Indonesia');
+      
+      setLandingTitle(latestSettings.landingTitle || '');
+      setLandingSubTitle(latestSettings.landingSubTitle || '');
+      setLandingHeroBadge(latestSettings.landingHeroBadge || '');
+      setLandingHeroTitle(latestSettings.landingHeroTitle || '');
+      setLandingHeroDesc(latestSettings.landingHeroDesc || '');
+      setLandingAgendaTitle(latestSettings.landingAgendaTitle || '');
+      setLandingFilterLabel(latestSettings.landingFilterLabel || '');
+      setLandingLogoUrl(latestSettings.landingLogoUrl || '');
+      setFeaturesList(latestSettings.featuresList || []);
     });
     return unsubscribe;
   }, []);
@@ -67,6 +93,16 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
     setBankInfoBank(latestSettings.bankInfoBank || 'Bank BCA');
     setBankInfoNumber(latestSettings.bankInfoNumber || '8830123456');
     setBankInfoName(latestSettings.bankInfoName || 'CV UMKM Digital Indonesia');
+    
+    setLandingTitle(latestSettings.landingTitle || '');
+    setLandingSubTitle(latestSettings.landingSubTitle || '');
+    setLandingHeroBadge(latestSettings.landingHeroBadge || '');
+    setLandingHeroTitle(latestSettings.landingHeroTitle || '');
+    setLandingHeroDesc(latestSettings.landingHeroDesc || '');
+    setLandingAgendaTitle(latestSettings.landingAgendaTitle || '');
+    setLandingFilterLabel(latestSettings.landingFilterLabel || '');
+    setLandingLogoUrl(latestSettings.landingLogoUrl || '');
+    setFeaturesList(latestSettings.featuresList || []);
     if (onRefreshAllData) onRefreshAllData();
   };
 
@@ -83,12 +119,51 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
       bankInfoBank,
       bankInfoNumber,
       bankInfoName,
-      ticketPrice: Number(ticketPrice)
+      ticketPrice: Number(ticketPrice),
+      landingTitle,
+      landingSubTitle,
+      landingHeroBadge,
+      landingHeroTitle,
+      landingHeroDesc,
+      landingAgendaTitle,
+      landingFilterLabel,
+      landingLogoUrl,
+      featuresList
     };
     DB.saveSettings(updatedSettings);
     setSettings(updatedSettings);
-    setSuccessMsg('Konfigurasi API Integrasi & Rekening Bank berhasil diperbarui.');
+    setSuccessMsg('Konfigurasi Pengaturan & API berhasil diperbarui.');
     setTimeout(() => setSuccessMsg(''), 4000);
+  };
+
+  const handleAddFeature = () => {
+    if (!newFeatureTitle || !newFeatureDesc) return;
+    const newFeat = {
+      id: editingFeatureId || `feat-${Date.now()}`,
+      title: newFeatureTitle,
+      description: newFeatureDesc
+    };
+    let updatedList = [];
+    if (editingFeatureId) {
+      updatedList = featuresList.map((f: any) => f.id === editingFeatureId ? newFeat : f);
+    } else {
+      updatedList = [...featuresList, newFeat];
+    }
+    setFeaturesList(updatedList);
+    setNewFeatureTitle('');
+    setNewFeatureDesc('');
+    setEditingFeatureId(null);
+  };
+
+  const handleEditFeature = (feat: any) => {
+    setNewFeatureTitle(feat.title);
+    setNewFeatureDesc(feat.description);
+    setEditingFeatureId(feat.id);
+  };
+
+  const handleDeleteFeature = (id: string) => {
+    const updatedList = featuresList.filter((f: any) => f.id !== id);
+    setFeaturesList(updatedList);
   };
 
   const handleUserRoleChange = (email: string, newRole: 'peserta' | 'admin' | 'superadmin') => {
@@ -1093,6 +1168,233 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
                     className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans"
                     required
                   />
+                </div>
+              </div>
+            </div>
+
+            {/* 6. Desain Tampilan Beranda & Kustomisasi Branding */}
+            <div className="bg-slate-950/40 border border-white/5 rounded-xl p-4.5 space-y-6">
+              <div className="border-b border-white/5 pb-2.5">
+                <h3 className="text-xs font-bold text-slate-205 flex items-center space-x-1.5">
+                  <Globe className="w-4 h-4 text-indigo-400 shrink-0" />
+                  <span>6. Kustomisasi Branding & Tampilan Beranda (Landing Page)</span>
+                </h3>
+                <p className="text-[10px] text-slate-400 mt-0.5">Edit semua tulisan promosi, badge, judul agenda, filter, ganti/upload logo, serta daftar keunggulan program secara langsung.</p>
+              </div>
+
+              {/* Row 1: Logo & Judul Utama Portal */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
+                <div className="space-y-1">
+                  <label className="block text-slate-405 font-semibold">Judul Logo Utama (Logo Prefix)</label>
+                  <input
+                    type="text"
+                    value={landingTitle}
+                    onChange={(e) => setLandingTitle(e.target.value)}
+                    placeholder="Default: WEBINAR UMKM"
+                    className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-slate-405 font-semibold">Sub-Judul Logo (Logo Suffix)</label>
+                  <input
+                    type="text"
+                    value={landingSubTitle}
+                    onChange={(e) => setLandingSubTitle(e.target.value)}
+                    placeholder="Default: Online Hub"
+                    className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-505 font-sans"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-slate-405 font-semibold">Logo Webinar (Foto / Logo Beranda)</label>
+                  <div className="flex items-center space-x-2">
+                    {landingLogoUrl && (
+                      <img src={landingLogoUrl} className="w-8 h-8 rounded object-cover border border-white/10 shrink-0" alt="Logo preview" referrerPolicy="no-referrer" />
+                    )}
+                    <label className="flex-grow flex items-center justify-center border border-dashed border-white/20 hover:border-indigo-550 rounded-xl p-1 text-slate-300 cursor-pointer bg-white/5 hover:bg-white/10 transition-colors text-[10px] text-center min-h-[34px]">
+                      <span>📁 {landingLogoUrl ? 'Ganti Foto Logo' : 'Upload Foto Logo'}</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setLandingLogoUrl(reader.result as string);
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }} 
+                        className="hidden" 
+                      />
+                    </label>
+                    {landingLogoUrl && (
+                      <button 
+                        type="button" 
+                        onClick={() => setLandingLogoUrl('')} 
+                        className="text-rose-405 hover:text-rose-400 font-bold px-1.5 text-sm cursor-pointer"
+                        title="Hapus Logo"
+                      >
+                        ×
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 2: Headline & Badge Hero */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
+                <div className="space-y-1">
+                  <label className="block text-slate-405 font-semibold">Badge Hero Atas</label>
+                  <input
+                    type="text"
+                    value={landingHeroBadge}
+                    onChange={(e) => setLandingHeroBadge(e.target.value)}
+                    placeholder="Default: Akselerasi Pengusaha Mikro Indonesia"
+                    className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-slate-405 font-semibold">Judul Hero (Headline Gradasi)</label>
+                  <input
+                    type="text"
+                    value={landingHeroTitle}
+                    onChange={(e) => setLandingHeroTitle(e.target.value)}
+                    placeholder="Default: Go Digital & Naik Kelas"
+                    className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans"
+                  />
+                </div>
+              </div>
+
+              {/* Row 3: Deskripsi Panjang Hero */}
+              <div className="space-y-1 text-xs">
+                <label className="block text-slate-405 font-semibold">Deskripsi Promosi Hero</label>
+                <textarea
+                  value={landingHeroDesc}
+                  onChange={(e) => setLandingHeroDesc(e.target.value)}
+                  placeholder="Ketik deskripsi lengkap tentang bootcamp webinar disini..."
+                  className="w-full h-20 bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans resize-none"
+                />
+              </div>
+
+              {/* Row 4: Label Filter & Agenda Katalog */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
+                <div className="space-y-1">
+                  <label className="block text-slate-405 font-semibold">Judul Atas Tabel Agenda</label>
+                  <input
+                    type="text"
+                    value={landingAgendaTitle}
+                    onChange={(e) => setLandingAgendaTitle(e.target.value)}
+                    placeholder="Default: AGENDA TERJADWAL"
+                    className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="block text-slate-405 font-semibold">Label Filter Topik</label>
+                  <input
+                    type="text"
+                    value={landingFilterLabel}
+                    onChange={(e) => setLandingFilterLabel(e.target.value)}
+                    placeholder="Default: Filter Topik:"
+                    className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans"
+                  />
+                </div>
+              </div>
+
+              {/* Row 5: Keunggulan Program / Program Benefits (Tambah, Edit, Delete) */}
+              <div className="border-t border-white/10 pt-4 space-y-4 font-sans">
+                <div className="flex justify-between items-center">
+                  <h4 className="text-[11px] uppercase tracking-wider font-extrabold text-slate-205">Daftar Keunggulan / Fitur Benefit Beranda</h4>
+                  <span className="text-[10px] text-slate-450">Sesuaikan poin keunggulan utama di halaman depan</span>
+                </div>
+
+                {/* Visual Grid of dynamic Features List */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {featuresList.map((feat: any, idx: number) => (
+                    <div key={feat.id || idx} className="bg-slate-950/50 rounded-xl p-3 border border-indigo-500/10 hover:border-indigo-500/20 relative flex flex-col justify-between group">
+                      <div>
+                        <h5 className="font-extrabold text-xs text-indigo-300 flex items-center space-x-1">
+                          <span>✓</span>
+                          <span>{feat.title}</span>
+                        </h5>
+                        <p className="text-[10px] text-slate-400 mt-1 leading-normal font-sans line-clamp-3">{feat.description}</p>
+                      </div>
+                      <div className="flex justify-end space-x-2.5 mt-3 pt-2 border-t border-white/5 opacity-80 group-hover:opacity-100 transition-opacity">
+                        <button
+                          type="button"
+                          onClick={() => handleEditFeature(feat)}
+                          className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold cursor-pointer"
+                        >
+                          Ubah
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteFeature(feat.id)}
+                          className="text-[10px] text-rose-400 hover:text-rose-300 font-semibold cursor-pointer"
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+
+                  {featuresList.length === 0 && (
+                    <div className="col-span-3 text-center py-4 bg-white/5 rounded-xl text-[10px] text-slate-400 font-mono">
+                      Belum ada keunggulan kustom. Keunggulan default (Gratis Sertifikat, Zoom Interaktif, Alumni Sukses) akan ditampilkan di beranda.
+                    </div>
+                  )}
+                </div>
+
+                {/* Inline Add / Edit Feature form panel */}
+                <div className="bg-slate-950/60 rounded-xl p-3.5 border border-white/5 space-y-3">
+                  <div className="text-[10px] font-bold text-indigo-400 tracking-wider">
+                    {editingFeatureId ? '📝 UBH KEUNGGULAN SEKARANG' : '＋ TAMBAH KEUNGGULAN BARU'}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                    <div className="space-y-1">
+                      <label className="block text-slate-405 font-medium">Nama Fitur / Judul Keunggulan</label>
+                      <input
+                        type="text"
+                        value={newFeatureTitle}
+                        onChange={(e) => setNewFeatureTitle(e.target.value)}
+                        placeholder="Contoh: 100% Gratis Bersertifikat"
+                        className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-1.5 outline-none focus:border-indigo-505"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="block text-slate-405 font-medium">Penjelasan Singkat Fitur</label>
+                      <input
+                        type="text"
+                        value={newFeatureDesc}
+                        onChange={(e) => setNewFeatureDesc(e.target.value)}
+                        placeholder="Contoh: Seluruh sesi webinar didukung penuh..."
+                        className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-1.5 outline-none focus:border-indigo-505"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex justify-end space-x-2">
+                    {editingFeatureId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setNewFeatureTitle('');
+                          setNewFeatureDesc('');
+                          setEditingFeatureId(null);
+                        }}
+                        className="px-3 py-1 bg-white/5 hover:bg-white/10 text-slate-300 text-[10px] uppercase font-bold rounded-lg transition shrink-0 cursor-pointer"
+                      >
+                        Batal
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleAddFeature}
+                      disabled={!newFeatureTitle || !newFeatureDesc}
+                      className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] uppercase font-bold rounded-lg transition cursor-pointer disabled:opacity-50 shrink-0"
+                    >
+                      {editingFeatureId ? 'Terapkan Perubahan' : 'Masukkan ke List'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

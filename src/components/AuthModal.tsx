@@ -346,42 +346,6 @@ export default function AuthModal({ isOpen, onClose, onSuccess, initialMode }: A
             </form>
           )}
 
-          {/* Quick Demo Accounts Helper Panel */}
-          <div className="mt-6 pt-5 border-t border-white/10">
-            <span className="block text-[11px] font-semibold text-indigo-400 font-mono tracking-wide uppercase text-center mb-3">
-              ⚡ Akun Demo Instan (Penguji / Assessor):
-            </span>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                id="btn-demo-peserta"
-                onClick={() => handleDemoLogin('peserta@umkm.id', 'peserta123')}
-                className="py-1.5 px-1 bg-white/5 hover:bg-indigo-600/35 hover:border-indigo-500 border border-white/5 rounded-lg text-slate-200 text-[10px] text-center transition-all cursor-pointer"
-              >
-                🎒 Peserta
-                <span className="block text-[8px] text-slate-405 font-mono">peserta123</span>
-              </button>
-              <button
-                type="button"
-                id="btn-demo-admin"
-                onClick={() => handleDemoLogin('admin@umkm.id', 'admin123')}
-                className="py-1.5 px-1 bg-white/5 hover:bg-indigo-600/35 hover:border-indigo-400 border border-white/5 rounded-lg text-slate-200 text-[10px] text-center transition-all cursor-pointer"
-              >
-                🛡️ Moderator
-                <span className="block text-[8px] text-slate-405 font-mono">admin123</span>
-              </button>
-              <button
-                type="button"
-                id="btn-demo-superadmin"
-                onClick={() => handleDemoLogin('superadmin@umkm.id', 'superadmin123')}
-                className="py-1.5 px-1 bg-white/5 hover:bg-indigo-600/35 hover:border-violet-400 border border-white/5 rounded-lg text-slate-200 text-[10px] text-center transition-all cursor-pointer"
-              >
-                ⚜️ SuperAdmin
-                <span className="block text-[8px] text-slate-405 font-mono flex-none">superadmin123</span>
-              </button>
-            </div>
-          </div>
-
           <div className="mt-5 text-center">
             <button
               onClick={() => {

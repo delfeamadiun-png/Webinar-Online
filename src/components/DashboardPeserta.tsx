@@ -789,7 +789,7 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
                           id={`btn-rsvp-${webinar.id}`}
                           className="w-full md:w-auto px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs uppercase rounded-xl transition-all shadow-md shadow-indigo-650/15 cursor-pointer accent-glow"
                         >
-                          Daftar Kelas (Gratis)
+                          Daftar Kelas Webinar
                         </button>
                       </div>
                     </div>

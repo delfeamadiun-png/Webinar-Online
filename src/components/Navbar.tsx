@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from '../database';
+import { User, DB } from '../database';
 import { LogOut, LogIn, Award, Shield, UserCheck, LayoutDashboard, Globe } from 'lucide-react';
 
 interface NavbarProps {
@@ -19,6 +19,10 @@ export default function Navbar({
   activeView,
   setActiveView
 }: NavbarProps) {
+  const settings = DB.getSettings();
+  const landingTitle = settings.landingTitle || 'WEBINAR UMKM';
+  const landingSubTitle = settings.landingSubTitle || 'Online Hub';
+
   return (
     <nav className="glass text-white sticky top-0 z-50 shadow-lg border-b border-white/10 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -29,15 +33,24 @@ export default function Navbar({
             onClick={() => setActiveView('landing')}
             id="nav-logo"
           >
-            <div className="bg-indigo-600 text-white font-bold p-2 rounded-lg flex items-center justify-center accent-glow-sm">
-              <Globe className="w-5 h-5 text-white" />
-            </div>
+            {settings.landingLogoUrl ? (
+              <img 
+                src={settings.landingLogoUrl} 
+                alt="Logo" 
+                className="w-9 h-9 object-cover rounded-lg border border-white/10 shrink-0" 
+                referrerPolicy="no-referrer"
+              />
+            ) : (
+              <div className="bg-indigo-600 text-white font-bold p-2 rounded-lg flex items-center justify-center accent-glow-sm">
+                <Globe className="w-5 h-5 text-white" />
+              </div>
+            )}
             <div>
-              <span className="font-sans font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-400 to-violet-300 bg-clip-text text-transparent">
-                WEBINAR UMKM
+              <span className="font-sans font-bold text-lg tracking-tight bg-gradient-to-r from-indigo-400 to-violet-300 bg-clip-text text-transparent block leading-none">
+                {landingTitle}
               </span>
-              <span className="block text-[10px] font-mono tracking-wider text-indigo-400 uppercase leading-none">
-                Online Hub
+              <span className="block text-[10px] font-mono tracking-wider text-indigo-400 uppercase mt-0.5 leading-none">
+                {landingSubTitle}
               </span>
             </div>
           </div>
@@ -144,7 +157,7 @@ export default function Navbar({
                   id="btn-register-trigger"
                   className="px-4 py-1.5 bg-indigo-600 text-white hover:bg-indigo-500 text-sm font-medium rounded-lg accent-glow transition-all cursor-pointer"
                 >
-                  Daftar Kelas
+                  Daftar Kelas Webinar
                 </button>
               </div>
             )}

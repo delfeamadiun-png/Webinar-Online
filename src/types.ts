@@ -45,6 +45,12 @@ export interface ChatMessage {
   timestamp: string;
 }
 
+export interface FeatureBenefit {
+  id: string;
+  title: string;
+  description: string;
+}
+
 export interface SystemSettings {
   zoomApiKey: string;
   zoomConnected: boolean;
@@ -58,4 +64,17 @@ export interface SystemSettings {
   ticketPrice: number;
   totalSales: number;
   trafficVisits: number;
+
+  // Custom landing settings
+  landingTitle?: string;
+  landingSubTitle?: string;
+  landingHeroBadge?: string;
+  landingHeroTitle?: string;
+  landingHeroDesc?: string;
+  landingAgendaTitle?: string;
+  landingFilterLabel?: string;
+  landingLogoUrl?: string; // base64 or URL
+
+  // Custom features lists (Create, Update, Delete supported)
+  featuresList?: FeatureBenefit[];
 }
