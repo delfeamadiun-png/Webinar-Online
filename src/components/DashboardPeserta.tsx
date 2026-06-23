@@ -53,7 +53,10 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
 
   // Check for unpaid webinars under restricted zoom settings
   const unpaidWebinars = settings.restrictZoomUnpaid
-    ? registeredWebinars.filter(w => !currentUser.paidWebinars?.includes(w.id))
+    ? registeredWebinars.filter(w => {
+        const price = w.price !== undefined ? w.price : (settings.midtransConnected ? settings.ticketPrice : 0);
+        return price > 0 && !currentUser.paidWebinars?.includes(w.id);
+      })
     : [];
 
   const handleRegisterWebinar = (webinarId: string) => {
@@ -76,7 +79,9 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
 
   const handleCheckIn = (webinarId: string) => {
     // Check if payment restriction is active and unpaid
-    if (settings.restrictZoomUnpaid && !currentUser.paidWebinars?.includes(webinarId)) {
+    const webinar = DB.getWebinarById(webinarId);
+    const price = webinar?.price !== undefined ? webinar.price : (settings.midtransConnected ? settings.ticketPrice : 0);
+    if (settings.restrictZoomUnpaid && price > 0 && !currentUser.paidWebinars?.includes(webinarId)) {
       alert("Akses Presensi ditolak: Anda belum melunasi biaya tiket pendaftaran untuk kelas webinar ini.");
       return;
     }
@@ -190,7 +195,7 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
                 </div>
                 <div className="pt-1.5 border-t border-white/5 text-[10px] text-slate-400 flex flex-wrap items-center gap-1">
                   <span>Nominal transfer: </span>
-                  <strong className="text-amber-400 font-mono">Rp {settings.ticketPrice.toLocaleString('id-ID')} / webinar</strong>
+                  <strong className="text-amber-400 font-sans">Sesuai nominal harga tiket webinar masing-masing</strong>
                   <span>. Setelah transfer, klik tombol konfirmasi WA di bawah ini dengan melampirkan bukti setor:</span>
                 </div>
               </div>
@@ -200,8 +205,9 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
             <div className="flex flex-col gap-2 shrink-0 md:w-56 font-sans">
               <span className="text-[9px] text-slate-400 uppercase tracking-wider font-semibold">Grup Hubungi Admin via WA:</span>
               {unpaidWebinars.map(webinar => {
+                const price = webinar.price !== undefined ? webinar.price : (settings.midtransConnected ? settings.ticketPrice : 0);
                 const waUrl = `https://wa.me/6281803100222?text=${encodeURIComponent(
-                  `Halo Admin, saya ingin konfirmasi bukti transfer pembayaran webinar "${webinar.title}" untuk akun ${currentUser.email}. Berikut bukti setoran saya.`
+                  `Halo Admin, saya ingin konfirmasi bukti transfer pembayaran webinar "${webinar.title}" sebesar Rp ${price.toLocaleString('id-ID')} untuk akun ${currentUser.email}. Berikut bukti setoran saya.`
                 )}`;
                 return (
                   <a
@@ -253,17 +259,17 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
                 <div className="md:col-span-7 space-y-3">
                   <div className="aspect-video bg-slate-950/70 border border-white/10 rounded-xl overflow-hidden relative flex items-center justify-center">
                     {selectedWebinarToPlay.status === 'live' ? (
-                      settings.restrictZoomUnpaid && !currentUser.paidWebinars?.includes(selectedWebinarToPlay.id) ? (
+                      settings.restrictZoomUnpaid && (selectedWebinarToPlay.price !== undefined ? selectedWebinarToPlay.price : (settings.midtransConnected ? settings.ticketPrice : 0)) > 0 && !currentUser.paidWebinars?.includes(selectedWebinarToPlay.id) ? (
                         <div className="text-center p-6 max-w-sm mx-auto">
                           <Lock className="w-12 h-12 text-rose-500 mx-auto mb-3 animate-bounce" />
                           <h4 className="text-sm font-bold text-rose-305 font-sans">Akses Rapat Zoom Terkunci</h4>
                           <p className="text-[11px] text-slate-300 mt-2 font-sans leading-relaxed">
-                            Sesuai pengaturan sesi berbayar, Anda wajib melunasi pendaftaran kelas sebesar <strong className="text-emerald-400 font-bold font-sans">Rp {settings.ticketPrice.toLocaleString('id-ID')}</strong> sebelum bergabung ke Zoom.
+                            Sesuai pengaturan sesi berbayar, Anda wajib melunasi pendaftaran kelas sebesar <strong className="text-emerald-400 font-bold font-sans">Rp {(selectedWebinarToPlay.price !== undefined ? selectedWebinarToPlay.price : settings.ticketPrice).toLocaleString('id-ID')}</strong> sebelum bergabung ke Zoom.
                           </p>
                           <div className="mt-4 flex justify-center">
                             <button
                               onClick={() => setPayingWebinarId(selectedWebinarToPlay.id)}
-                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-550 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center space-x-1.5 shadow-md shadow-emerald-500/15 cursor-pointer"
+                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-555 text-white text-xs font-bold rounded-xl transition-all inline-flex items-center space-x-1.5 shadow-md shadow-emerald-500/15 cursor-pointer font-sans"
                             >
                               <CreditCard className="w-3.5 h-3.5" />
                               <span>Bayar & Buka Zoom</span>
@@ -289,12 +295,12 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
                         </div>
                       )
                     ) : selectedWebinarToPlay.status === 'completed' ? (
-                      settings.restrictZoomUnpaid && !currentUser.paidWebinars?.includes(selectedWebinarToPlay.id) ? (
+                      settings.restrictZoomUnpaid && (selectedWebinarToPlay.price !== undefined ? selectedWebinarToPlay.price : (settings.midtransConnected ? settings.ticketPrice : 0)) > 0 && !currentUser.paidWebinars?.includes(selectedWebinarToPlay.id) ? (
                         <div className="text-center p-6 max-w-sm mx-auto">
                           <Lock className="w-12 h-12 text-rose-500 mx-auto mb-3 animate-bounce" />
                           <h4 className="text-sm font-bold text-rose-300 font-sans">Rekaman & Materi Terkunci</h4>
                           <p className="text-[11px] text-slate-300 mt-2 font-sans leading-relaxed">
-                            Sesuai kebijakan pendaftaran berbayar, akses rekaman dan materi pelajaran eksklusif untuk webinar ini terkunci. Anda wajib melunasi biaya pendaftaran sebesar <strong className="text-emerald-400 font-bold font-sans">Rp {settings.ticketPrice.toLocaleString('id-ID')}</strong> untuk membuka seluruh materi dan video rekaman.
+                            Sesuai kebijakan pendaftaran berbayar, akses rekaman dan materi pelajaran eksklusif untuk webinar ini terkunci. Anda wajib melunasi biaya pendaftaran sebesar <strong className="text-emerald-400 font-bold font-sans">Rp {(selectedWebinarToPlay.price !== undefined ? selectedWebinarToPlay.price : settings.ticketPrice).toLocaleString('id-ID')}</strong> untuk membuka seluruh materi dan video rekaman.
                           </p>
                           <div className="mt-4 flex justify-center">
                             <button
@@ -397,14 +403,14 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
                   )}
 
                   {/* Materi Belajar Eksklusif */}
-                  {settings.restrictZoomUnpaid && !currentUser.paidWebinars?.includes(selectedWebinarToPlay.id) ? (
+                  {settings.restrictZoomUnpaid && (selectedWebinarToPlay.price !== undefined ? selectedWebinarToPlay.price : (settings.midtransConnected ? settings.ticketPrice : 0)) > 0 && !currentUser.paidWebinars?.includes(selectedWebinarToPlay.id) ? (
                     <div className="p-4 bg-slate-950/40 border border-rose-500/10 rounded-xl space-y-2">
-                      <div className="flex items-center space-x-2 text-rose-405">
+                      <div className="flex items-center space-x-2 text-rose-300">
                         <Lock className="w-4 h-4 text-rose-500 animate-pulse" />
                         <span className="text-xs font-bold font-sans">Materi Belajar (Video, Audio & PDF) Terkunci</span>
                       </div>
                       <p className="text-[11px] text-slate-400 font-sans leading-relaxed">
-                        Sesuai kebijakan berbayar, seluruh materi Slide PDF, Audio podcast penjelasan narasumber, serta Video alternatif pembelajaran luar dari YouTube/sumber luar lainnya terkunci. Selesaikan pembayaran tiket sebesar <strong className="text-emerald-400 font-bold font-sans">Rp {settings.ticketPrice.toLocaleString('id-ID')}</strong> untuk membuka akses materi lengkap.
+                        Sesuai kebijakan berbayar, seluruh materi Slide PDF, Audio podcast penjelasan narasumber, serta Video alternatif pembelajaran luar dari YouTube/sumber luar lainnya terkunci. Selesaikan pembayaran tiket sebesar <strong className="text-emerald-400 font-bold font-sans">Rp {(selectedWebinarToPlay.price !== undefined ? selectedWebinarToPlay.price : settings.ticketPrice).toLocaleString('id-ID')}</strong> untuk membuka akses materi lengkap.
                       </p>
                     </div>
                   ) : (
@@ -933,54 +939,174 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
             <div className="p-6 sm:p-10 bg-gradient-to-br from-amber-50 to-amber-100 border-[16px] border-slate-900 text-slate-900 rounded-lg">
               <div className="border border-double border-amber-800/40 p-6 flex flex-col items-center justify-between">
                 
+                {/* Logo from settings */}
+                <div className="mb-1 flex justify-center items-center">
+                  {settings.landingLogoUrl ? (
+                    <img 
+                      src={settings.landingLogoUrl} 
+                      className="h-10 sm:h-12 w-auto object-contain" 
+                      alt="Webinar Logo Prefix Suffix" 
+                      referrerPolicy="no-referrer" 
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-amber-800/10 text-amber-900 flex items-center justify-center font-bold text-lg border border-amber-800/20">
+                      🎓
+                    </div>
+                  )}
+                </div>
+
                 {/* Ribbon decoration top */}
-                <span className="text-[10px] font-semibold text-amber-800 tracking-widest uppercase font-mono mb-2">
+                <span className="text-[10px] font-extrabold text-amber-800 tracking-widest uppercase font-mono mb-1.5 mt-1">
                   📜 SERTIFIKAT KELULUSAN RESMI
                 </span>
                 
-                <h2 className="text-2xl font-serif font-bold text-amber-950 px-2 tracking-wide text-center">
+                <h2 className="text-xl sm:text-2xl font-serif font-bold text-amber-950 px-2 tracking-wide text-center">
                   UMKM Digital Academy Indonesia
                 </h2>
                 
-                <div className="w-[100px] h-0.5 bg-amber-800/35 my-4"></div>
+                <div className="w-[100px] h-0.5 bg-amber-800/35 my-3"></div>
  
-                <p className="text-xs text-slate-700 italic font-mono">Diberikan dengan hormat kepada:</p>
+                <p className="text-[10px] text-slate-700 italic font-mono mb-0.5">Diberikan dengan hormat kepada:</p>
                 
-                <h3 className="text-2xl font-sans font-extrabold text-slate-950 tracking-tight my-4">
+                <h3 className="text-xl sm:text-2xl font-sans font-extrabold text-slate-950 tracking-tight my-2.5">
                   {currentUser.namaLengkap}
                 </h3>
 
-                <p className="text-xs text-slate-700 max-w-md mx-auto leading-relaxed">
+                <p className="text-[10px] sm:text-xs text-slate-700 max-w-md mx-auto leading-relaxed">
                   Atas partisipasi aktif, kehadiran penuh, dan penyelesaian tugas materi dalam modul pembelajaran:
                 </p>
 
-                <h4 className="text-sm font-bold text-amber-900 my-3 font-sans px-4 bg-amber-50/70 border border-amber-800/10 py-1 rounded">
+                <h4 className="text-xs sm:text-sm font-bold text-amber-900 my-2.5 font-sans px-4 bg-amber-50/70 border border-amber-800/10 py-1.5 rounded max-w-lg">
                   {activeCert.webinarTitle}
                 </h4>
 
-                <p className="text-xs text-slate-700">
+                <p className="text-[10px] sm:text-xs text-slate-700">
                   yang diselenggarakan secara daring oleh <strong>UMKM Online Center Indonesia</strong>.
                 </p>
 
-                {/* Badges footer */}
-                <div className="grid grid-cols-2 gap-8 w-full mt-8 pt-6 border-t border-amber-800/20 text-center">
-                  <div>
-                    <span className="block text-[9px] font-bold text-slate-600 font-mono">ID SERTIFIKAT</span>
-                    <span className="block text-xs font-mono font-bold text-amber-900 mt-0.5">{activeCert.code}</span>
+                {/* Aligned Footer badge of ID, Verified Seal, and Date as requested - now positioned ABOVE signatures */}
+                <div className="grid grid-cols-3 gap-2 w-full mt-6 pt-4 border-t border-dashed border-amber-800/25 items-center text-center">
+                  {/* Left: ID */}
+                  <div className="flex flex-col justify-center">
+                    <span className="block text-[7px] sm:text-[8px] font-bold text-slate-600 font-mono tracking-wide">ID SERTIFIKAT</span>
+                    <span className="block text-[9px] sm:text-xs font-mono font-bold text-amber-950 mt-0.5 select-all">{activeCert.code}</span>
                   </div>
-                  <div>
-                    <span className="block text-[9px] font-bold text-slate-600 font-mono">TANGGAL TERBIT</span>
-                    <span className="block text-xs font-mono font-bold text-amber-900 mt-0.5">{activeCert.date}</span>
+
+                  {/* Center: Seal Image customizable from Super Admin */}
+                  <div className="flex flex-col items-center justify-center">
+                    {settings.certSealImgUrl ? (
+                      <img 
+                        src={settings.certSealImgUrl} 
+                        className="h-11 sm:h-12 w-auto object-contain mb-0.5" 
+                        alt="Verified Seal" 
+                        referrerPolicy="no-referrer" 
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full border-2 border-double border-amber-700 flex items-center justify-center text-[8px] text-amber-850 bg-amber-150 font-black font-serif shadow-sm">
+                        GOLD
+                      </div>
+                    )}
+                    <span className="text-[7px] font-extrabold tracking-wider mt-1 text-amber-900 uppercase font-mono">
+                      VERIFIED ONLINE
+                    </span>
+                  </div>
+
+                  {/* Right: Issued Date */}
+                  <div className="flex flex-col justify-center">
+                    <span className="block text-[7px] sm:text-[8px] font-bold text-slate-600 font-mono tracking-wide">TANGGAL TERBIT</span>
+                    <span className="block text-[9px] sm:text-xs font-sans font-bold text-amber-950 mt-0.5">{activeCert.date}</span>
                   </div>
                 </div>
 
-                {/* Hologram Circle */}
-                <div className="mt-6 flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full border border-dashed border-amber-700 flex items-center justify-center text-amber-800 bg-amber-200/50 text-xs font-bold font-mono">
-                    SEAL
-                  </div>
-                  <span className="text-[8px] text-amber-850 mt-1 font-mono tracking-wider">VERIFIED ONLINE</span>
-                </div>
+                {/* 3-Column Narasumber / Signatures - now positioned BELOW ID & Seal details */}
+                {(() => {
+                  const s1Active = settings.certSpeaker1Active !== false;
+                  const s2Active = settings.certSpeaker2Active !== false;
+                  const s3Active = settings.certSpeaker3Active !== false;
+                  const activeCount = [s1Active, s2Active, s3Active].filter(Boolean).length;
+                  const gridColsClass = activeCount === 1 ? 'grid-cols-1' : activeCount === 2 ? 'grid-cols-2' : 'grid-cols-3';
+
+                  if (activeCount === 0) return null;
+
+                  return (
+                    <div className={`grid ${gridColsClass} gap-3 w-full mt-5 pt-4 border-t border-amber-800/15 text-center`}>
+                      {/* Column Narasumber 1 */}
+                      {s1Active && (
+                        <div className="flex flex-col items-center justify-between min-h-[85px]">
+                          {settings.certSpeaker1Title && settings.certSpeaker1Title.trim() !== "" ? (
+                            <span className="block text-[7px] text-slate-500 uppercase tracking-widest font-extrabold font-mono">{settings.certSpeaker1Title}</span>
+                          ) : (
+                            <div className="h-[10px]"></div>
+                          )}
+                          <div className="my-1.5 min-h-[36px] flex items-center justify-center">
+                            {settings.certSpeaker1Sign ? (
+                              settings.certSpeaker1Sign.startsWith('data:image') ? (
+                                <img src={settings.certSpeaker1Sign} alt="Sign 1" className="h-8 object-contain max-w-[80px]" referrerPolicy="no-referrer" />
+                              ) : (
+                                <span className="font-serif italic font-extrabold text-amber-955 text-xs tracking-wide px-1 border-b border-amber-800/10 leading-none">{settings.certSpeaker1Sign}</span>
+                              )
+                            ) : (
+                              <span className="font-serif italic font-extrabold text-amber-955 text-xs tracking-wide px-1 border-b border-amber-800/10 leading-none">S. Uno</span>
+                            )}
+                          </div>
+                          <span className="block text-[8px] sm:text-[9px] font-bold text-slate-800 h-6 leading-tight truncate w-full px-0.5" title={settings.certSpeaker1Name || 'Dr. H. Sandiaga Uno, B.B.A.'}>
+                            {settings.certSpeaker1Name || 'Dr. H. Sandiaga Uno, B.B.A.'}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Column Narasumber 2 */}
+                      {s2Active && (
+                        <div className="flex flex-col items-center justify-between min-h-[85px]">
+                          {settings.certSpeaker2Title && settings.certSpeaker2Title.trim() !== "" ? (
+                            <span className="block text-[7px] text-slate-500 uppercase tracking-widest font-extrabold font-mono">{settings.certSpeaker2Title}</span>
+                          ) : (
+                            <div className="h-[10px]"></div>
+                          )}
+                          <div className="my-1.5 min-h-[36px] flex items-center justify-center">
+                            {settings.certSpeaker2Sign ? (
+                              settings.certSpeaker2Sign.startsWith('data:image') ? (
+                                <img src={settings.certSpeaker2Sign} alt="Sign 2" className="h-8 object-contain max-w-[80px]" referrerPolicy="no-referrer" />
+                              ) : (
+                                <span className="font-serif italic font-extrabold text-amber-955 text-xs tracking-wide px-1 border-b border-amber-800/10 leading-none">{settings.certSpeaker2Sign}</span>
+                              )
+                            ) : (
+                              <span className="font-serif italic font-extrabold text-amber-955 text-xs tracking-wide px-1 border-b border-amber-800/10 leading-none">Rina A.</span>
+                            )}
+                          </div>
+                          <span className="block text-[8px] sm:text-[9px] font-bold text-slate-800 h-6 leading-tight truncate w-full px-0.5" title={settings.certSpeaker2Name || 'Ibu Rina Astuti, M.E.'}>
+                            {settings.certSpeaker2Name || 'Ibu Rina Astuti, M.E.'}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Column Narasumber 3 */}
+                      {s3Active && (
+                        <div className="flex flex-col items-center justify-between min-h-[85px]">
+                          {settings.certSpeaker3Title && settings.certSpeaker3Title.trim() !== "" ? (
+                            <span className="block text-[7px] text-slate-500 uppercase tracking-widest font-extrabold font-mono">{settings.certSpeaker3Title}</span>
+                          ) : (
+                            <div className="h-[10px]"></div>
+                          )}
+                          <div className="my-1.5 min-h-[36px] flex items-center justify-center">
+                            {settings.certSpeaker3Sign ? (
+                              settings.certSpeaker3Sign.startsWith('data:image') ? (
+                                <img src={settings.certSpeaker3Sign} alt="Sign 3" className="h-8 object-contain max-w-[80px]" referrerPolicy="no-referrer" />
+                              ) : (
+                                <span className="font-serif italic font-extrabold text-amber-955 text-xs tracking-wide px-1 border-b border-amber-800/10 leading-none">{settings.certSpeaker3Sign}</span>
+                              )
+                            ) : (
+                              <span className="font-serif italic font-extrabold text-amber-955 text-xs tracking-wide px-1 border-b border-amber-800/10 leading-none">Budi S.</span>
+                            )}
+                          </div>
+                          <span className="block text-[8px] sm:text-[9px] font-bold text-slate-800 h-6 leading-tight truncate w-full px-0.5" title={settings.certSpeaker3Name || 'Bapak Budi Santoso, S.E.'}>
+                            {settings.certSpeaker3Name || 'Bapak Budi Santoso, S.E.'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
               </div>
             </div>
@@ -1009,8 +1135,9 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
       {payingWebinarId && (() => {
         const matchingWebinar = webinars.find(w => w.id === payingWebinarId);
         const matchingWebinarTitle = matchingWebinar ? matchingWebinar.title : "Webinar";
+        const matchingWebinarPrice = matchingWebinar?.price !== undefined ? matchingWebinar.price : (settings.midtransConnected ? settings.ticketPrice : 0);
         const payingWaUrl = `https://wa.me/6281803100222?text=${encodeURIComponent(
-          `Halo Admin, saya ingin konfirmasi bukti transfer pembayaran webinar "${matchingWebinarTitle}" untuk akun ${currentUser.email}. Berikut bukti setoran saya.`
+          `Halo Admin, saya ingin konfirmasi bukti transfer pembayaran webinar "${matchingWebinarTitle}" sebesar Rp ${matchingWebinarPrice.toLocaleString('id-ID')} untuk akun ${currentUser.email}. Berikut bukti setoran saya.`
         )}`;
 
         return (
@@ -1028,7 +1155,7 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
                 </div>
                 <button 
                   onClick={() => setPayingWebinarId(null)}
-                  className="text-slate-450 hover:text-white text-xs px-2 py-1 bg-white/5 rounded-lg border border-white/5 cursor-pointer"
+                  className="text-slate-450 hover:text-white text-xs px-2 py-1 bg-white/5 rounded-lg border border-white/5 cursor-pointer font-sans"
                 >
                   Tutup
                 </button>
@@ -1038,9 +1165,9 @@ export default function DashboardPeserta({ currentUser, onUpdateUser }: Dashboar
               <div className="bg-slate-950/50 p-3.5 rounded-xl border border-white/5 flex items-center justify-between">
                 <div>
                   <span className="block text-[9px] text-slate-500 uppercase tracking-wider font-semibold">Total Biaya Tiket</span>
-                  <span className="text-lg font-mono font-bold text-emerald-400">Rp {settings.ticketPrice.toLocaleString('id-ID')}</span>
+                  <span className="text-lg font-mono font-bold text-emerald-400">Rp {matchingWebinarPrice.toLocaleString('id-ID')}</span>
                 </div>
-                <div className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-xl text-[9px] font-bold uppercase">
+                <div className="bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded-xl text-[9px] font-bold uppercase font-mono">
                   Belum Lunas
                 </div>
               </div>

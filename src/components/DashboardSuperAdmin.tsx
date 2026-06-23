@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Webinar, SystemSettings, DB } from '../database';
-import { Plus, Trash2, Edit, Save, Globe, Shield, UserX, Calendar, Key, Check, BarChart2, TrendingUp, Users, DollarSign, Settings, RefreshCw, Layers } from 'lucide-react';
+import { Plus, Trash2, Edit, Save, Globe, Shield, UserX, Calendar, Key, Check, BarChart2, TrendingUp, Users, DollarSign, Settings, RefreshCw, Layers, Award } from 'lucide-react';
 
 interface DashboardSuperAdminProps {
   currentUser: User;
@@ -27,6 +27,7 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
   const [recordingUrl, setRecordingUrl] = useState('');
   const [zoomJoinUrl, setZoomJoinUrl] = useState('');
   const [zoomStartUrl, setZoomStartUrl] = useState('');
+  const [webinarPrice, setWebinarPrice] = useState<number>(0);
 
   // API Integration States
   const [zoomApiKey, setZoomApiKey] = useState(settings.zoomApiKey);
@@ -50,6 +51,21 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
   const [landingFilterLabel, setLandingFilterLabel] = useState(settings.landingFilterLabel || '');
   const [landingLogoUrl, setLandingLogoUrl] = useState(settings.landingLogoUrl || '');
   const [featuresList, setFeaturesList] = useState(settings.featuresList || []);
+
+  // Certificate Settings states
+  const [certSpeaker1Name, setCertSpeaker1Name] = useState(settings.certSpeaker1Name || 'Dr. H. Sandiaga Uno, B.B.A.');
+  const [certSpeaker1Sign, setCertSpeaker1Sign] = useState(settings.certSpeaker1Sign || '');
+  const [certSpeaker1Title, setCertSpeaker1Title] = useState(settings.certSpeaker1Title || 'NARASUMBER I');
+  const [certSpeaker1Active, setCertSpeaker1Active] = useState(settings.certSpeaker1Active !== undefined ? settings.certSpeaker1Active : true);
+  const [certSpeaker2Name, setCertSpeaker2Name] = useState(settings.certSpeaker2Name || 'Ibu Rina Astuti, M.E.');
+  const [certSpeaker2Sign, setCertSpeaker2Sign] = useState(settings.certSpeaker2Sign || '');
+  const [certSpeaker2Title, setCertSpeaker2Title] = useState(settings.certSpeaker2Title || 'NARASUMBER II');
+  const [certSpeaker2Active, setCertSpeaker2Active] = useState(settings.certSpeaker2Active !== undefined ? settings.certSpeaker2Active : true);
+  const [certSpeaker3Name, setCertSpeaker3Name] = useState(settings.certSpeaker3Name || 'Bapak Budi Santoso, S.E.');
+  const [certSpeaker3Sign, setCertSpeaker3Sign] = useState(settings.certSpeaker3Sign || '');
+  const [certSpeaker3Title, setCertSpeaker3Title] = useState(settings.certSpeaker3Title || 'NARASUMBER III');
+  const [certSpeaker3Active, setCertSpeaker3Active] = useState(settings.certSpeaker3Active !== undefined ? settings.certSpeaker3Active : true);
+  const [certSealImgUrl, setCertSealImgUrl] = useState(settings.certSealImgUrl || '');
 
   // Features list item CRUD helpers
   const [newFeatureTitle, setNewFeatureTitle] = useState('');
@@ -80,6 +96,20 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
       setLandingFilterLabel(latestSettings.landingFilterLabel || '');
       setLandingLogoUrl(latestSettings.landingLogoUrl || '');
       setFeaturesList(latestSettings.featuresList || []);
+
+      setCertSpeaker1Name(latestSettings.certSpeaker1Name || 'Dr. H. Sandiaga Uno, B.B.A.');
+      setCertSpeaker1Sign(latestSettings.certSpeaker1Sign || '');
+      setCertSpeaker1Title(latestSettings.certSpeaker1Title || 'NARASUMBER I');
+      setCertSpeaker1Active(latestSettings.certSpeaker1Active !== undefined ? latestSettings.certSpeaker1Active : true);
+      setCertSpeaker2Name(latestSettings.certSpeaker2Name || 'Ibu Rina Astuti, M.E.');
+      setCertSpeaker2Sign(latestSettings.certSpeaker2Sign || '');
+      setCertSpeaker2Title(latestSettings.certSpeaker2Title || 'NARASUMBER II');
+      setCertSpeaker2Active(latestSettings.certSpeaker2Active !== undefined ? latestSettings.certSpeaker2Active : true);
+      setCertSpeaker3Name(latestSettings.certSpeaker3Name || 'Bapak Budi Santoso, S.E.');
+      setCertSpeaker3Sign(latestSettings.certSpeaker3Sign || '');
+      setCertSpeaker3Title(latestSettings.certSpeaker3Title || 'NARASUMBER III');
+      setCertSpeaker3Active(latestSettings.certSpeaker3Active !== undefined ? latestSettings.certSpeaker3Active : true);
+      setCertSealImgUrl(latestSettings.certSealImgUrl || '');
     });
     return unsubscribe;
   }, []);
@@ -103,6 +133,20 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
     setLandingFilterLabel(latestSettings.landingFilterLabel || '');
     setLandingLogoUrl(latestSettings.landingLogoUrl || '');
     setFeaturesList(latestSettings.featuresList || []);
+
+    setCertSpeaker1Name(latestSettings.certSpeaker1Name || 'Dr. H. Sandiaga Uno, B.B.A.');
+    setCertSpeaker1Sign(latestSettings.certSpeaker1Sign || '');
+    setCertSpeaker1Title(latestSettings.certSpeaker1Title || 'NARASUMBER I');
+    setCertSpeaker1Active(latestSettings.certSpeaker1Active !== undefined ? latestSettings.certSpeaker1Active : true);
+    setCertSpeaker2Name(latestSettings.certSpeaker2Name || 'Ibu Rina Astuti, M.E.');
+    setCertSpeaker2Sign(latestSettings.certSpeaker2Sign || '');
+    setCertSpeaker2Title(latestSettings.certSpeaker2Title || 'NARASUMBER II');
+    setCertSpeaker2Active(latestSettings.certSpeaker2Active !== undefined ? latestSettings.certSpeaker2Active : true);
+    setCertSpeaker3Name(latestSettings.certSpeaker3Name || 'Bapak Budi Santoso, S.E.');
+    setCertSpeaker3Sign(latestSettings.certSpeaker3Sign || '');
+    setCertSpeaker3Title(latestSettings.certSpeaker3Title || 'NARASUMBER III');
+    setCertSpeaker3Active(latestSettings.certSpeaker3Active !== undefined ? latestSettings.certSpeaker3Active : true);
+    setCertSealImgUrl(latestSettings.certSealImgUrl || '');
     if (onRefreshAllData) onRefreshAllData();
   };
 
@@ -128,7 +172,20 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
       landingAgendaTitle,
       landingFilterLabel,
       landingLogoUrl,
-      featuresList
+      featuresList,
+      certSpeaker1Name,
+      certSpeaker1Sign,
+      certSpeaker1Title,
+      certSpeaker1Active,
+      certSpeaker2Name,
+      certSpeaker2Sign,
+      certSpeaker2Title,
+      certSpeaker2Active,
+      certSpeaker3Name,
+      certSpeaker3Sign,
+      certSpeaker3Title,
+      certSpeaker3Active,
+      certSealImgUrl
     };
     DB.saveSettings(updatedSettings);
     setSettings(updatedSettings);
@@ -190,6 +247,7 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
     setMaterialAudioUrl('');
     setMaterialVideoUrl('');
     setRecordingUrl('');
+    setWebinarPrice(50000);
     const randomZoomId = Math.floor(100000000 + Math.random() * 900000000);
     const randomPasscode = Math.random().toString(36).substring(2, 8).toUpperCase();
     setZoomJoinUrl(`https://zoom.us/j/${randomZoomId}?pwd=${randomPasscode}`);
@@ -211,6 +269,7 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
     setRecordingUrl(w.recordingUrl || '');
     setZoomJoinUrl(w.zoomJoinUrl || '');
     setZoomStartUrl(w.zoomStartUrl || '');
+    setWebinarPrice(w.price !== undefined ? w.price : (settings.ticketPrice || 0));
   };
 
   const handleSaveWebinar = (e: React.FormEvent) => {
@@ -248,7 +307,8 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
         recordingUrl: recordingUrl || undefined,
         zoomJoinUrl: zoomJoinUrl || 'https://zoom.us/j/' + Math.floor(100000000 + Math.random() * 900000000),
         zoomStartUrl: zoomStartUrl || 'https://zoom.us/s/' + Math.floor(100000000 + Math.random() * 900000000) + '_start',
-        registeredCount: 0
+        registeredCount: 0,
+        price: Number(webinarPrice)
       };
       DB.addWebinar(newWeb);
       setSuccessMsg('Jadwal Webinar baru berhasil ditambahkan.');
@@ -269,7 +329,8 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
           materialVideoUrl: materialVideoUrl || undefined,
           recordingUrl: recordingUrl || undefined,
           zoomJoinUrl: zoomJoinUrl || existing.zoomJoinUrl,
-          zoomStartUrl: zoomStartUrl || existing.zoomStartUrl
+          zoomStartUrl: zoomStartUrl || existing.zoomStartUrl,
+          price: Number(webinarPrice)
         };
         DB.updateWebinar(updatedWeb);
         setSuccessMsg('Data webinar berhasil diperbarui.');
@@ -318,7 +379,10 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
   const activeUsersCount = users.filter(u => u.role === 'peserta' && u.registeredWebinars && u.registeredWebinars.length > 0).length;
   const totalCheckInsCount = users.reduce((sum, u) => sum + (u.checkedIn?.length || 0), 0);
   const attendanceRate = totalRegistrationsCount > 0 ? (totalCheckInsCount / totalRegistrationsCount) * 100 : 0;
-  const totalCalculatedSales = webinars.reduce((sum, w) => sum + ((w.registeredCount || 0) * (settings.midtransConnected ? settings.ticketPrice : 0)), 0);
+  const totalCalculatedSales = webinars.reduce((sum, w) => {
+    const p = w.price !== undefined ? w.price : (settings.midtransConnected ? settings.ticketPrice : 0);
+    return sum + ((w.registeredCount || 0) * p);
+  }, 0);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -569,7 +633,7 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {webinars.map(w => {
-                    const price = settings.midtransConnected ? settings.ticketPrice : 0;
+                    const price = w.price !== undefined ? w.price : (settings.midtransConnected ? settings.ticketPrice : 0);
                     const sales = (w.registeredCount || 0) * price;
                     return (
                       <tr key={w.id} className="text-slate-300 hover:bg-white/5 transition-colors">
@@ -723,6 +787,20 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
                 </div>
 
                 <div className="space-y-1.5">
+                  <label className="block text-xs text-amber-400 font-bold">Harga Tiket Mandiri (Rupiah)</label>
+                  <input
+                    type="number"
+                    value={webinarPrice}
+                    onChange={(e) => setWebinarPrice(Number(e.target.value))}
+                    placeholder="Contoh: 50000"
+                    className="w-full bg-slate-950/40 border border-white/10 text-slate-200 text-xs rounded-xl px-3 py-2 outline-none focus:border-indigo-500 font-sans"
+                  />
+                  <p className="text-[10px] text-slate-400 font-sans leading-none mt-0.5">Atur berapa biaya tiket webinar ini (misal: 50.000, atau tulis 0 jika gratis).</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 font-sans">
+                <div className="space-y-1.5">
                   <label className="block text-xs text-emerald-400 font-bold">Link Materi Audio / Podcast (Materi Lunas)</label>
                   <input
                     type="url"
@@ -744,7 +822,7 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
                   />
                 </div>
 
-                <div className="space-y-1.5 md:col-span-3">
+                <div className="space-y-1.5 md:col-span-2">
                   <label className="block text-xs text-slate-300 font-medium">Link Youtube Video Rekaman Siaran (Status Completed - Registran Lunas)</label>
                   <input
                     type="url"
@@ -1394,6 +1472,346 @@ export default function DashboardSuperAdmin({ currentUser, onRefreshAllData }: D
                     >
                       {editingFeatureId ? 'Terapkan Perubahan' : 'Masukkan ke List'}
                     </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 7. Pengaturan Desain & Tanda Tangan E-Sertifikat */}
+            <div className="bg-slate-950/40 border border-white/5 rounded-xl p-4.5 space-y-6">
+              <div className="border-b border-white/5 pb-2.5">
+                <h3 className="text-xs font-bold text-slate-205 flex items-center space-x-1.5 font-sans">
+                  <Award className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="font-sans">7. Pengaturan Struktur & Tanda Tangan E-Sertifikat</span>
+                </h3>
+                <p className="text-[10px] text-slate-400 mt-0.5 font-sans">
+                  Edit 3 nama narasumber beserta tanda tangannya (tulis teks tanda tangan atau upload file gambar tanda tangan), serta pasang stempel / seal verifikasi resmi di tengah sertifikat.
+                </p>
+              </div>
+
+              {/* 3 Columns Speakers */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 text-xs font-sans">
+                {/* Speaker 1 Column */}
+                <div className={`bg-slate-950/50 p-3.5 rounded-xl border border-white/5 space-y-4 transition-all ${certSpeaker1Active ? '' : 'opacity-40'}`}>
+                  <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                    <span className="font-extrabold text-[10px] text-indigo-400 font-mono">📢 NARASUMBER KOLOM 1</span>
+                    <label className="flex items-center space-x-1 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={certSpeaker1Active} 
+                        onChange={(e) => setCertSpeaker1Active(e.target.checked)} 
+                        className="rounded bg-slate-900 border-white/10 text-indigo-600 focus:ring-0 w-3 h-3 cursor-pointer"
+                      />
+                      <span className="text-[10px] font-bold text-slate-300">Aktif</span>
+                    </label>
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Label Atas Narasumber 1</label>
+                    <input
+                      type="text"
+                      value={certSpeaker1Title}
+                      onChange={(e) => setCertSpeaker1Title(e.target.value)}
+                      placeholder="Contoh: NARASUMBER I"
+                      className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-2 outline-none focus:border-indigo-500"
+                    />
+                    <p className="text-[9px] text-slate-500 leading-none">Kosongkan jika tidak ingin ada tulisan label atas.</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Nama Narasumber 1</label>
+                    <input
+                      type="text"
+                      value={certSpeaker1Name}
+                      onChange={(e) => setCertSpeaker1Name(e.target.value)}
+                      placeholder="Contoh: Dr. H. Sandiaga Uno, B.B.A."
+                      className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-2 outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Tanda Tangan (Gambar / Teks Cursive)</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        {certSpeaker1Sign ? (
+                          <div className="bg-white/10 p-1 rounded border border-white/10 shrink-0">
+                            {certSpeaker1Sign.startsWith('data:image') ? (
+                              <img src={certSpeaker1Sign} alt="TTD 1" className="w-12 h-6 object-contain invert brightness-200" referrerPolicy="no-referrer" />
+                            ) : (
+                              <span className="font-serif italic font-bold text-xs text-amber-200 px-1">{certSpeaker1Sign}</span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-[8px] font-mono text-slate-400 bg-white/5 p-1 rounded">No Signature</div>
+                        )}
+                        
+                        <label className="flex-grow flex items-center justify-center border border-dashed border-white/20 hover:border-indigo-500 rounded-xl px-2 py-1 bg-white/5 hover:bg-white/10 transition-colors text-[9px] text-center cursor-pointer min-h-[28px]">
+                          <span>Upload Gambar</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setCertSpeaker1Sign(reader.result as string);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[9px] text-slate-400">Atau ketik alternatif teks:</span>
+                        <input
+                          type="text"
+                           placeholder="Nama singkatan (misal: S. Uno)"
+                          onChange={(e) => setCertSpeaker1Sign(e.target.value)}
+                          className="flex-grow bg-slate-950/60 border border-white/10 text-slate-300 text-[9px] rounded px-2 py-1 outline-none focus:border-indigo-500 font-sans"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Speaker 2 Column */}
+                <div className={`bg-slate-950/50 p-3.5 rounded-xl border border-white/5 space-y-4 transition-all ${certSpeaker2Active ? '' : 'opacity-40'}`}>
+                  <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                    <span className="font-extrabold text-[10px] text-indigo-400 font-mono">📢 NARASUMBER KOLOM 2</span>
+                    <label className="flex-grow flex justify-end items-center space-x-1 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={certSpeaker2Active} 
+                        onChange={(e) => setCertSpeaker2Active(e.target.checked)} 
+                        className="rounded bg-slate-900 border-white/10 text-indigo-600 focus:ring-0 w-3 h-3 cursor-pointer"
+                      />
+                      <span className="text-[10px] font-bold text-slate-300">Aktif</span>
+                    </label>
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Label Atas Narasumber 2</label>
+                    <input
+                      type="text"
+                      value={certSpeaker2Title}
+                      onChange={(e) => setCertSpeaker2Title(e.target.value)}
+                      placeholder="Contoh: NARASUMBER II"
+                      className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-2 outline-none focus:border-indigo-500"
+                    />
+                    <p className="text-[9px] text-slate-500 leading-none">Kosongkan jika tidak ingin ada tulisan label atas.</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Nama Narasumber 2</label>
+                    <input
+                      type="text"
+                      value={certSpeaker2Name}
+                      onChange={(e) => setCertSpeaker2Name(e.target.value)}
+                      placeholder="Contoh: Ibu Rina Astuti, M.E."
+                      className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-2 outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Tanda Tangan (Gambar / Teks Cursive)</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        {certSpeaker2Sign ? (
+                          <div className="bg-white/10 p-1 rounded border border-white/10 shrink-0">
+                            {certSpeaker2Sign.startsWith('data:image') ? (
+                              <img src={certSpeaker2Sign} alt="TTD 2" className="w-12 h-6 object-contain invert brightness-200" referrerPolicy="no-referrer" />
+                            ) : (
+                              <span className="font-serif italic font-bold text-xs text-amber-200 px-1">{certSpeaker2Sign}</span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-[8px] font-mono text-slate-405 bg-white/5 p-1 rounded">No Signature</div>
+                        )}
+                        
+                        <label className="flex-grow flex items-center justify-center border border-dashed border-white/20 hover:border-indigo-500 rounded-xl px-2 py-1 bg-white/5 hover:bg-white/10 transition-colors text-[9px] text-center cursor-pointer min-h-[28px]">
+                          <span>Upload Gambar</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setCertSpeaker2Sign(reader.result as string);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[9px] text-slate-400">Atau ketik alternatif teks:</span>
+                        <input
+                          type="text"
+                          placeholder="Nama singkatan (misal: Rina A.)"
+                          onChange={(e) => setCertSpeaker2Sign(e.target.value)}
+                          className="flex-grow bg-slate-950/60 border border-white/10 text-slate-300 text-[9px] rounded px-2 py-1 outline-none focus:border-indigo-500 font-sans"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Speaker 3 Column */}
+                <div className={`bg-slate-950/50 p-3.5 rounded-xl border border-white/5 space-y-4 transition-all ${certSpeaker3Active ? '' : 'opacity-40'}`}>
+                  <div className="flex items-center justify-between border-b border-white/5 pb-1.5">
+                    <span className="font-extrabold text-[10px] text-indigo-400 font-mono">📢 NARASUMBER KOLOM 3</span>
+                    <label className="flex-grow flex justify-end items-center space-x-1 cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        checked={certSpeaker3Active} 
+                        onChange={(e) => setCertSpeaker3Active(e.target.checked)} 
+                        className="rounded bg-slate-900 border-white/10 text-indigo-600 focus:ring-0 w-3 h-3 cursor-pointer"
+                      />
+                      <span className="text-[10px] font-bold text-slate-300">Aktif</span>
+                    </label>
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Label Atas Narasumber 3</label>
+                    <input
+                      type="text"
+                      value={certSpeaker3Title}
+                      onChange={(e) => setCertSpeaker3Title(e.target.value)}
+                      placeholder="Contoh: NARASUMBER III"
+                      className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-2 outline-none focus:border-indigo-500"
+                    />
+                    <p className="text-[9px] text-slate-500 leading-none">Kosongkan jika tidak ingin ada tulisan label atas.</p>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Nama Narasumber 3</label>
+                    <input
+                      type="text"
+                      value={certSpeaker3Name}
+                      onChange={(e) => setCertSpeaker3Name(e.target.value)}
+                      placeholder="Contoh: Bapak Budi Santoso, S.E."
+                      className="w-full bg-slate-950/40 border border-white/10 text-slate-300 text-xs rounded-xl px-2.5 py-2 outline-none focus:border-indigo-500"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-400 font-medium">Tanda Tangan (Gambar / Teks Cursive)</label>
+                    <div className="space-y-2">
+                      <div className="flex items-center space-x-2">
+                        {certSpeaker3Sign ? (
+                          <div className="bg-white/10 p-1 rounded border border-white/10 shrink-0">
+                            {certSpeaker3Sign.startsWith('data:image') ? (
+                              <img src={certSpeaker3Sign} alt="TTD 3" className="w-12 h-6 object-contain invert brightness-200" referrerPolicy="no-referrer" />
+                            ) : (
+                              <span className="font-serif italic font-bold text-xs text-amber-200 px-1">{certSpeaker3Sign}</span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-[8px] font-mono text-slate-405 bg-white/5 p-1 rounded">No Signature</div>
+                        )}
+                        
+                        <label className="flex-grow flex items-center justify-center border border-dashed border-white/20 hover:border-indigo-500 rounded-xl px-2 py-1 bg-white/5 hover:bg-white/10 transition-colors text-[9px] text-center cursor-pointer min-h-[28px]">
+                          <span>Upload Gambar</span>
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                              const file = e.target.files?.[0];
+                              if (file) {
+                                const reader = new FileReader();
+                                reader.onloadend = () => {
+                                  setCertSpeaker3Sign(reader.result as string);
+                                };
+                                reader.readAsDataURL(file);
+                              }
+                            }}
+                            className="hidden"
+                          />
+                        </label>
+                      </div>
+
+                      <div className="flex items-center space-x-1.5">
+                        <span className="text-[9px] text-slate-400">Atau ketik alternatif teks:</span>
+                        <input
+                          type="text"
+                          placeholder="Nama singkatan (misal: Budi S.)"
+                          onChange={(e) => setCertSpeaker3Sign(e.target.value)}
+                          className="flex-grow bg-slate-950/60 border border-white/10 text-slate-300 text-[9px] rounded px-2 py-1 outline-none focus:border-indigo-500 font-sans"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Verified Online Seal / Stamp Customisation */}
+              <div className="bg-slate-950/50 p-4 rounded-xl border border-white/5 space-y-4 text-xs">
+                <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                  <span className="font-extrabold text-[10px] text-indigo-400 font-mono">🌟 BADGE STAMP / SEAL VERIFIKASI (TENGAH)</span>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="block text-slate-405 font-semibold font-sans">Upload Gambar Seal Kustom (Verified Online)</label>
+                    <p className="text-[10px] text-slate-400 font-sans">Upload stempel dinas, qr code approval, atau logo keabsahan khusus untuk diletakkan di tengah-bawah sejajar ID & Tanggal Terbit.</p>
+                    <div className="flex items-center space-x-3 pt-2">
+                      {certSealImgUrl && (
+                        <div className="p-1 px-2 bg-amber-50 rounded border border-amber-500/10">
+                          <img src={certSealImgUrl} alt="Custom Seal" className="h-10 object-contain" referrerPolicy="no-referrer" />
+                        </div>
+                      )}
+                      
+                      <label className="flex-grow flex items-center justify-center border border-dashed border-white/20 hover:border-indigo-500 rounded-xl p-2 text-slate-300 cursor-pointer bg-white/5 hover:bg-white/10 transition-colors text-[11px] text-center min-h-[38px] font-sans">
+                        <span>📁 {certSealImgUrl ? 'Ganti Gambar Seal' : 'Upload File Gambar Seal'}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setCertSealImgUrl(reader.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                          className="hidden"
+                        />
+                      </label>
+                      
+                      {certSealImgUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setCertSealImgUrl('')}
+                          className="px-3.5 py-1.5 bg-rose-600/35 hover:bg-rose-600 text-rose-300 font-bold rounded-lg transition text-[10px] uppercase tracking-wider cursor-pointer font-sans"
+                        >
+                          Reset Default
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="bg-slate-950/80 p-3 rounded-xl border border-white/5 flex flex-col justify-center items-center text-center space-y-1">
+                    <span className="text-[9px] text-slate-450 uppercase font-bold tracking-wider font-mono">Preview Status Seal saat ini:</span>
+                    {certSealImgUrl ? (
+                      <div className="text-[10px] text-emerald-400 font-semibold flex items-center space-x-1 font-sans">
+                        <span>● Menggunakan Gambar Kustom</span>
+                      </div>
+                    ) : (
+                      <div className="text-[10px] text-indigo-400 font-semibold flex items-center space-x-1 font-sans">
+                        <span>● Menggunakan Ribbon Gold Seal (Default)</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

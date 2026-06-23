@@ -169,5 +169,14 @@ export const INITIAL_SETTINGS: SystemSettings = {
       title: 'Alumni Terbukti Sukses Ekspor',
       description: 'Raih peluang jejaring dan saksikan ratusan komoditas retail kriya, kuliner, dan fashion binaan yang berhasil go global.'
     }
-  ]
+  ],
+
+  // Default certificate settings
+  certSpeaker1Name: 'Dr. H. Sandiaga Uno, B.B.A.',
+  certSpeaker1Sign: '',
+  certSpeaker2Name: 'Ibu Rina Astuti, M.E.',
+  certSpeaker2Sign: '',
+  certSpeaker3Name: 'Bapak Budi Santoso, S.E.',
+  certSpeaker3Sign: '',
+  certSealImgUrl: ''
 };

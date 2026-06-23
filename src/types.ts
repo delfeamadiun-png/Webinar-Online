@@ -34,6 +34,7 @@ export interface Webinar {
   zoomJoinUrl: string;
   zoomStartUrl: string;
   registeredCount: number;
+  price?: number;
 }
 
 export interface ChatMessage {
@@ -77,4 +78,19 @@ export interface SystemSettings {
 
   // Custom features lists (Create, Update, Delete supported)
   featuresList?: FeatureBenefit[];
+
+  // Custom Certificate fields
+  certSpeaker1Name?: string;
+  certSpeaker1Sign?: string;
+  certSpeaker1Title?: string;
+  certSpeaker1Active?: boolean;
+  certSpeaker2Name?: string;
+  certSpeaker2Sign?: string;
+  certSpeaker2Title?: string;
+  certSpeaker2Active?: boolean;
+  certSpeaker3Name?: string;
+  certSpeaker3Sign?: string;
+  certSpeaker3Title?: string;
+  certSpeaker3Active?: boolean;
+  certSealImgUrl?: string;
 }

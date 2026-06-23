@@ -125,7 +125,14 @@ export default function Hero({ onExploreClick, onRegisterClick, isLoggedIn }: He
                       </>
                     )}
                   </div>
-                  <span className="text-[10px] font-mono text-indigo-300 bg-indigo-950/40 px-2 py-0.5 rounded border border-indigo-500/10">IDR 0 (Free)</span>
+                  <span className="text-[10px] font-mono text-amber-300 bg-amber-950/40 px-2 py-0.5 rounded border border-amber-500/15 uppercase font-bold">
+                    {displayedWebinar ? (
+                      (() => {
+                        const price = displayedWebinar.price !== undefined ? displayedWebinar.price : (settings.midtransConnected ? settings.ticketPrice : 0);
+                        return price > 0 ? `Rp ${price.toLocaleString('id-ID')}` : 'Gratis / Free';
+                      })()
+                    ) : 'Gratis'}
+                  </span>
                 </div>
 
                 {displayedWebinar ? (
