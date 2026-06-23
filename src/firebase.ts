@@ -18,13 +18,14 @@ import {
   User, 
   Webinar, 
   ChatMessage, 
-  SystemSettings, 
-  DB,
+  SystemSettings 
+} from "./types";
+import {
   INITIAL_USERS,
   INITIAL_WEBINARS,
   INITIAL_SETTINGS,
-  INITIAL_CHAT_MESSAGES 
-} from "./database";
+  INITIAL_CHAT_MESSAGES
+} from "./initialData";
 
 const firebaseConfig = {
   projectId: "handy-modem-36d0h",
@@ -265,12 +266,31 @@ export function startRealtimeSync(onUpdateCallback: () => void) {
   };
 }
 
+// Helper function to remove undefined values before writing to Firestore
+function sanitizeForFirestore(obj: any): any {
+  if (obj === null || obj === undefined) return null;
+  if (Array.isArray(obj)) {
+    return obj.map(sanitizeForFirestore);
+  }
+  if (typeof obj === "object") {
+    const clean: any = {};
+    for (const key of Object.keys(obj)) {
+      const val = obj[key];
+      if (val !== undefined) {
+        clean[key] = sanitizeForFirestore(val);
+      }
+    }
+    return clean;
+  }
+  return obj;
+}
+
 // CRUD operations that write directly to Firestore to keep database authoritative
 export const FirestoreDB = {
   // Update/Save single user
   async saveUser(user: User): Promise<void> {
     try {
-      await setDoc(doc(db, "users", user.email.toLowerCase()), user);
+      await setDoc(doc(db, "users", user.email.toLowerCase()), sanitizeForFirestore(user));
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, `users/${user.email.toLowerCase()}`);
     }
@@ -279,7 +299,7 @@ export const FirestoreDB = {
   // Update/Save single webinar
   async saveWebinar(webinar: Webinar): Promise<void> {
     try {
-      await setDoc(doc(db, "webinars", webinar.id), webinar);
+      await setDoc(doc(db, "webinars", webinar.id), sanitizeForFirestore(webinar));
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, `webinars/${webinar.id}`);
     }
@@ -297,7 +317,7 @@ export const FirestoreDB = {
   // Add chat message
   async addChatMessage(msg: ChatMessage): Promise<void> {
     try {
-      await setDoc(doc(db, "chats", msg.id), msg);
+      await setDoc(doc(db, "chats", msg.id), sanitizeForFirestore(msg));
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, `chats/${msg.id}`);
     }
@@ -322,7 +342,7 @@ export const FirestoreDB = {
   // Save Settings
   async saveSettings(settings: SystemSettings): Promise<void> {
     try {
-      await setDoc(doc(db, "settings", "global"), settings);
+      await setDoc(doc(db, "settings", "global"), sanitizeForFirestore(settings));
     } catch (e) {
       handleFirestoreError(e, OperationType.WRITE, "settings/global");
     }

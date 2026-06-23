@@ -41,15 +41,37 @@ export default function App() {
         await fetchCollectionsFromFirestore();
 
         if (isMounted) {
-          // Subscribe to Firestore updates and real-time syncing ONLY after clean init
+          // Check if there is already a logged-in user in memory
+          const lastUser = localStorage.getItem('umkm_last_active_user');
+          if (lastUser) {
+            try {
+              const u = JSON.parse(lastUser) as User;
+              // Verify user still exists in DB (using the fresh list just imported from Firestore)
+              const fresh = DB.getUserByEmail(u.email);
+              if (fresh) {
+                setCurrentUser(fresh);
+                // Redirect to appropriate dashboard
+                if (fresh.role === 'superadmin') setActiveView('superadmin_dashboard');
+                else if (fresh.role === 'admin') setActiveView('admin_dashboard');
+                else setActiveView('peserta_dashboard');
+              }
+            } catch (e) {
+              console.error('Error logging in last active user', e);
+            }
+          }
+
+          // Subscribe to Firestore updates and real-time syncing ONLY after clean init and session recovery
           syncUnsubscribe = startRealtimeSync(() => {
             // Force component re-render when Firestore triggers onSnapshot
             setRefreshSeed(prev => prev + 1);
             
-            const lastUser = localStorage.getItem('umkm_last_active_user');
-            if (lastUser) {
+            // Notify local DB subscribers to refresh their components and views
+            DB.notify();
+            
+            const realtimerUser = localStorage.getItem('umkm_last_active_user');
+            if (realtimerUser) {
               try {
-                const u = JSON.parse(lastUser) as User;
+                const u = JSON.parse(realtimerUser) as User;
                 const fresh = DB.getUserByEmail(u.email);
                 if (fresh) {
                   setCurrentUser(fresh);
@@ -73,25 +95,6 @@ export default function App() {
 
     // Increase traffic count on page mount
     DB.increaseTraffic();
-
-    // Check if there is already a logged-in user in memory
-    const lastUser = localStorage.getItem('umkm_last_active_user');
-    if (lastUser) {
-      try {
-        const u = JSON.parse(lastUser) as User;
-        // Verify user still exists in DB
-        const fresh = DB.getUserByEmail(u.email);
-        if (fresh) {
-          setCurrentUser(fresh);
-          // Redirect to appropriate dashboard
-          if (fresh.role === 'superadmin') setActiveView('superadmin_dashboard');
-          else if (fresh.role === 'admin') setActiveView('admin_dashboard');
-          else setActiveView('peserta_dashboard');
-        }
-      } catch (e) {
-        console.error('Error logging in last active user', e);
-      }
-    }
 
     // Subscribe to local actions
     const unsubDB = DB.subscribe(() => {

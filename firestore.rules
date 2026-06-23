@@ -2,28 +2,8 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // Default-deny safety net
+    // Default-allow block for debugging, permitting anyone to read and write any data
     match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // Settings collection - read/write for anyone
-    match /settings/{settingsId} {
-      allow read, write: if true;
-    }
-
-    // Users collection - read/write for anyone
-    match /users/{userId} {
-      allow read, write: if true;
-    }
-
-    // Webinars collection - read/write for anyone
-    match /webinars/{webinarId} {
-      allow read, write: if true;
-    }
-
-    // Chats collection - read/write for anyone
-    match /chats/{chatId} {
       allow read, write: if true;
     }
   }
